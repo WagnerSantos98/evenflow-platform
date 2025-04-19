@@ -2,6 +2,8 @@ const Usuario  = require('../models/Usuario');
 const { Op } = require('sequelize');
 const s3Service = require('../services/s3Service');
 const { formatarDocumento, formatarCEP, formatarData } = require('../utils/formatadores');
+const { createStripeCustomer } = require('../utils/stripe'); 
+
 
 //Classe usuário
 class UsuarioController{
@@ -31,6 +33,12 @@ class UsuarioController{
         const dataNascimentoFormatada = formatarData(dataNascimento);
         const cepFormatado = endereco?.cep ? formatarCEP(endereco.cep) : null;
 
+        // Cria cliente na Stripe
+        const stripeCustomer = await createStripeCustomer({ 
+            email: email, 
+            name: nome });
+        console.log(stripeCustomer);
+
         //Cadastrar usuário
         const novoUsuario = await Usuario.create({
             nome,
@@ -45,7 +53,8 @@ class UsuarioController{
                 ...endereco,
                 cep: cepFormatado
             },
-            foto
+            foto,
+            stripeCustomerId: stripeCustomer?.id // Salva o ID do cliente da Stripe
         });
 
         //Se houver arquivo, fazer upload  para S3

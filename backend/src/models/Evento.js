@@ -47,7 +47,7 @@ const Evento = sequelize.define('Evento', {
         defaultValue: 'L'
     },
     status:{
-        type: DataTypes.ENUM('em cartaz', 'cancelado', 'encerrado'),
+        type: DataTypes.ENUM('em cartaz', 'cancelado', 'encerrado', 'ativo'),
         allowNull: false,
         defaultValue: 'em cartaz'
     },
@@ -63,6 +63,16 @@ const Evento = sequelize.define('Evento', {
         type: DataTypes.UUID,
         allowNull: true,
     },
+    stripeProductId : {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
+    stripePriceId : {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    }
 
 }, {
     hooks:{
@@ -70,6 +80,11 @@ const Evento = sequelize.define('Evento', {
             //Se o evento for online, não precisa de local
             if(evento.tipoEvento === 'online'){
                 evento.localId = null;
+            }
+            // Se o preço do ingresso for menor que 0, os campos Stripe devem ser nulos
+            if (evento.precoIngresso < 0) {
+                evento.stripeProductId = null;
+                evento.stripePriceId = null;
             }
         }
     }

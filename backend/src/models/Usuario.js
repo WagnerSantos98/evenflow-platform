@@ -8,6 +8,11 @@ const Usuario = sequelize.define('Usuario', {
         defaultValue: DataTypes.UUIDV4,
         primaryKey: true
     },
+    stripeCustomerId : {
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true
+    },
     nome:{
         type: DataTypes.STRING,
         allowNull: false

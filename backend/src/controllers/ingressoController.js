@@ -16,7 +16,7 @@ class IngressoController{
                 return res.status(400).json({ errors: errors.array() });
             }
 
-            const { eventoId, quantidade, metodoPagamento } = req.body;
+            const { eventoId, quantidade, metodoPagamento, tipo, preco } = req.body;
             const usuarioId = req.usuario.id;
 
             //Verificação de existência de evento e se está ativo
@@ -25,14 +25,16 @@ class IngressoController{
                 return res.status(404).json({ mensagem: 'Evento não encontrado' });
             }
 
-            if(evento.status != 'ativo'){
-                return res.status(400).json({ mensagem: 'Evento não está disponível para venda de ingressos' });
-            }
+            // if(evento.status != 'ativo'){
+            //     return res.status(400).json({ mensagem: 'Evento não está disponível para venda de ingressos' });
+            // }
             
             //Criar o ingresso
             const ingresso = await Ingresso.create({
+                preco,
+                tipo,
                 eventoId,
-                usuarioId,
+                compradorId: usuarioId,
                 quantidade,
                 metodoPagamento,
                 status: 'pendente'

@@ -1,3 +1,4 @@
+const { now } = require('moment');
 const { Notificacao, Usuario } = require('../models/associations/index');
 const { validationResult } = require('express-validator');
 
@@ -17,13 +18,14 @@ class NotificacaoController {
             if (!usuario) {
                 return res.status(404).json({ mensagem: 'Usuário não encontrado!' });
             }
-
+            let dataCriacao = new Date().toString().replace(/T/, ':').replace(/\.\w*/, '');
             // Criar a notificação
             const novaNotificacao = await Notificacao.create({
                 nome,
                 icone,
                 texto,
-                usuarioId
+                usuarioId,
+                dataCriacao: dataCriacao
             });
 
             res.status(201).json(novaNotificacao);

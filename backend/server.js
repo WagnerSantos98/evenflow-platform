@@ -11,6 +11,7 @@ const eventoRoutes = require('./src/routes/evento.routes');
 const ingressoRoutes = require('./src/routes/ingresso.routes');
 const avaliacaoRoutes = require('./src/routes/avaliacao.routes');
 const notificacoesRoutes = require('./src/routes/notificacao.routes');
+const checkoutSessionRoutes = require('./src/routes/checkoutSession.routes');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use('/api/eventos', eventoRoutes);
 app.use('/api/ingressos', ingressoRoutes);
 app.use('/api/avaliacoes', avaliacaoRoutes);
 app.use('/api/notificacoes', notificacoesRoutes);
+app.use('/api/checkout-sessions', checkoutSessionRoutes);
 
 //Rota de confirmação de teste
 app.get('/', (req, res) => {

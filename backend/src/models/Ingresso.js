@@ -2,6 +2,8 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const Evento = require('./Evento');
 const Usuario = require('./Usuario');
+const { v4: uuidv4 } = require('uuid'); // Importa o UUID para gerar códigos únicos
+
 
 const Ingresso = sequelize.define('Ingresso', {
     id:{
@@ -10,16 +12,17 @@ const Ingresso = sequelize.define('Ingresso', {
         primaryKey: true
     },
     codigo:{
-        type: DataTypes. STRING,
-        allowNull: false,
-        unique: true
+        type: DataTypes.STRING,
+        allowNull: true,
+        unique: true,
+
     },
     preco:{
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false
     },
     status:{
-        type: DataTypes.ENUM('disponivel', 'reservado', 'vendido', 'utilizado', 'cancelado'),
+        type: DataTypes.ENUM('pendente','disponivel', 'reservado', 'vendido', 'utilizado', 'cancelado'),
         defaultValue: 'disponivel',
         allowNull: false
     },
@@ -50,6 +53,13 @@ const Ingresso = sequelize.define('Ingresso', {
         references:{
             model: Usuario,
             key: 'id'
+        }
+    }
+}, {
+    hooks: {
+        beforeCreate: async (ingresso) => {
+            // Gera um código único para o ingresso
+            ingresso.codigo = `ING-${uuidv4().split('-')[0].toUpperCase()}`;
         }
     }
 });

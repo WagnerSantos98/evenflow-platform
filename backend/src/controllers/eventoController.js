@@ -1,7 +1,7 @@
 const { Evento, Local } = require('../models/associations/index');
 const { Op } = require('sequelize');
 const { validationResult } = require('express-validator');
-
+const { createStripeProduct } = require('../utils/stripe');
 
 class EventoController {
 
@@ -58,7 +58,18 @@ class EventoController {
             if(eventoExistente){
                 return response.status(400).send({mensagem:'Já existe um evento neste local nesta mesma data e horário.'});
             }
+            let stripeProduct;
+            
+            // Se for evento pago, vai gerar um produto na stripe para pode gerar checkout no ingresso
+            if(precoIngresso && precoIngresso > 0){
 
+                stripeProduct = await createStripeProduct({
+                    name: nome,
+                    description: descricao,
+                    price: precoIngresso
+                })
+            }
+           
             const novoEvento = await Evento.create({
                 nome, 
                 descricao, 
@@ -71,7 +82,9 @@ class EventoController {
                 classificacaoEtaria, 
                 status,
                 localId,
-                organizadorId: request.usuario.id
+                organizadorId: request.usuario.id,
+                stripeProductId: stripeProduct?.id,
+                stripePriceId: stripeProduct?.default_price
             });
 
             response.status(201).json(novoEvento);
