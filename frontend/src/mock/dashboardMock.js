@@ -39,3 +39,15 @@ export const mockUsuarios = [
         status: 'inativo'
     }
 ];
+
+export const mockConfiguracoes = [
+  {
+    nomePlataforma: 'Evenflow',
+    emailContato: 'evenflow@evenflow.com',
+    telefone: '(11)4032-1234',
+    endereco: 'Rua Marcolino Lino de Novaes',
+    cnpj: '12.368.187/0001-60',
+    taxaServico: '10',
+    
+  }
+];

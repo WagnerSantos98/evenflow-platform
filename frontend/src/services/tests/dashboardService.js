@@ -1,4 +1,4 @@
-import { mockEventos, mockUsuarios } from '../../mock/dashboardMock';
+import { mockEventos, mockUsuarios, mockConfiguracoes } from '../../mock/dashboardMock';
 import api from '../api';
 
 const USE_MOCK = true;
@@ -103,8 +103,12 @@ const periodos = {
 //Módulo de Configurações - Obter e atualizar
 const configuracoes = {
     obterConfiguracoes: async () => {
-        const response = await api.get('/configuracoes');
-        return response.data;
+        if(USE_MOCK){
+            return mockConfiguracoes;
+        }else{
+            const response = await api.get('/configuracoes');
+            return response.data;
+        }
     },
     atualizarConfiguracoes: async(configuracao) => {
         const response = await api.put('/configuracoes', configuracao);
