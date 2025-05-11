@@ -24,5 +24,18 @@ export const mockEventos = [
 ];
 
 export const mockUsuarios = [
-
+    {
+        id: 1,
+        nome: 'Vanessa',
+        email: 'vanessa.cormack@geradornv.com.br',
+        nivelAcesso: 'admin',
+        status: 'ativo'
+    },
+    {
+        id: 2,
+        nome: 'Elias',
+        email: 'elias.meyer@geradornv.com.br',
+        nivelAcesso: 'cliente',
+        status: 'inativo'
+    }
 ];
