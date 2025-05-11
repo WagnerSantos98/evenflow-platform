@@ -2,16 +2,16 @@ import { useState, useEffect } from 'react';
 import dashboardService from '../../services/tests/dashboardService'; //Dados mockados
 
 //Constantes inciais
-    const INITIAL_FORM_DATA = {
-        titulo: '',
-        data: '',
-        local: '',
-        descricao: '',
-        preco: '',
-        quantidadeIngressos: '',
-        categoria: '',
-        status: 'rascunho'
-    };
+const INITIAL_FORM_DATA = {
+    titulo: '',
+    data: '',
+    local: '',
+    descricao: '',
+    preco: '',
+    quantidadeIngressos: '',
+    categoria: '',
+    status: 'rascunho'
+};
 
 const useEventos = (mostrarMensagem) => {
     const [eventos, setEventos] = useState([]);
