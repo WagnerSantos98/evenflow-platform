@@ -11,7 +11,7 @@ import Eventos from './pages/Eventos';
 import EventoDetalhes from './pages/content/EventoDetalhes';
 import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
-//import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/Dashboard';
 
 function App() {
   return (

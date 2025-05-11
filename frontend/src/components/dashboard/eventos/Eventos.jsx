@@ -334,3 +334,5 @@ const Eventos = ({ mostrarMensagem }) => {
             </Box>
     );
 };
+
+export default Eventos;

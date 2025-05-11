@@ -71,9 +71,9 @@ const Dashboard = () => {
           variant="fullWidth"
         >
           <Tab label="Eventos" />
-          <Tab label="Usuários" />
+          {/*<Tab label="Usuários" />
           <Tab label="Relatórios" />
-          <Tab label="Configurações" />
+          <Tab label="Configurações" />*/}
         </Tabs>
       </Paper>
 
