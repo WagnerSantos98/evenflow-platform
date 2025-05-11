@@ -91,6 +91,16 @@ const useUsuarios = (mostrarMensagem) => {
         }
     };
 
+    const handleToggleStatus = async (id, novoStatus) => {
+    try {
+      await dashboardService.atualizarStatusUsuario(id, novoStatus);
+      mostrarMensagem('Status do usuário atualizado com sucesso!');
+      carregarUsuarios();
+    } catch (error) {
+      mostrarMensagem('Erro ao atualizar status do usuário', error);
+    }
+  };
+
 
     return{
         usuarios,
@@ -101,7 +111,8 @@ const useUsuarios = (mostrarMensagem) => {
         handleCloseDialog,
         handleInputChange,
         handleSubmit,
-        handleDeleteUsuario
+        handleDeleteUsuario,
+        handleToggleStatus
     }
 };
 

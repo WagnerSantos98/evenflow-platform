@@ -10,7 +10,7 @@ import {
   Alert,
 } from '@mui/material';
 import Eventos from '../components/dashboard/eventos/Eventos';
-//import GerenciarUsuarios from '../components/dashboard/usuarios/GerenciarUsuarios';
+import Usuarios from '../components/dashboard/usuarios/Usuarios';
 //import RelatoriosFinanceiros from '../components/dashboard/relatorios/RelatoriosFinanceiros';
 //import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
 
@@ -46,7 +46,7 @@ const Dashboard = () => {
       case 0:
         return <Eventos mostrarMensagem={mostrarMensagem} />;
       case 1:
-        return <GerenciarUsuarios mostrarMensagem={mostrarMensagem} />;
+        return <Usuarios mostrarMensagem={mostrarMensagem} />;
       case 2:
         return <RelatoriosFinanceiros mostrarMensagem={mostrarMensagem} />;
       case 3:
@@ -71,8 +71,8 @@ const Dashboard = () => {
           variant="fullWidth"
         >
           <Tab label="Eventos" />
-          {/*<Tab label="Usuários" />
-          <Tab label="Relatórios" />
+          <Tab label="Usuários" />
+          {/*<Tab label="Relatórios" />
           <Tab label="Configurações" />*/}
         </Tabs>
       </Paper>
