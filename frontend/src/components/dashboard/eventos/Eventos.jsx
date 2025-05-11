@@ -26,7 +26,7 @@ import{
     Delete,
     Visibility
 } from '@mui/icons-material';
-import dashboardService from '../../../services/tests/dashboardService';
+import dashboardService from '../../../services/tests/dashboardService'; //Dados mockados
 
 const Eventos = ({ mostrarMensagem }) => {
     const [eventos, setEventos] = useState([]);
