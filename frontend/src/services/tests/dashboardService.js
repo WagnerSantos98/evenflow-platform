@@ -38,10 +38,14 @@ const eventos = {
 };
 
 //Método de Usuários - Listagem, Criação, Edição e Exclusão
-/*const usuarios = {
+const usuarios = {
     listarUsuarios: async () => {
-        const response = await api.get('/usuarios');
-        return response.data;
+        if(USE_MOCK){
+            return mockUsuarios;
+        }else{
+            const response = await api.get('/usuarios');
+            return response.data;
+        }
     },
     criarUsuario: async (usuario) => {
         const response = await api.post('/usuario', usuario);
@@ -58,7 +62,7 @@ const eventos = {
 };
 
 //Método de Relatórios Financeiros - Listagem das vendas (Período, Evento, Categoria e Resumo)
-const relatoriosFinanceiros = {
+/*const relatoriosFinanceiros = {
     vendasPorPeriodo: async (periodo, dataInicio, dataFim) => {
         const response = await api.get('/relatorios/vendas/periodo', {
             params: { periodo, dataInicio, dataFim }
@@ -112,8 +116,8 @@ const configuracoes = {
 const dashboardService = {
     //estatisticas,
     eventos,
-   /*usuarios,
-    relatoriosFinanceiros,
+    usuarios,
+    /*relatoriosFinanceiros,
     periodos,
     configuracoes*/
 };
