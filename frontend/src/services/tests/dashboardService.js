@@ -98,7 +98,7 @@ const periodos = {
         const response = await api.get(`dashboard/relatioro-ingressos?periodo=${periodo}`);
         return response.data;
     }
-};
+};*/
 
 //Módulo de Configurações - Obter e atualizar
 const configuracoes = {
@@ -110,7 +110,7 @@ const configuracoes = {
         const response = await api.put('/configuracoes', configuracao);
         return response.data;
     }
-};*/
+};
 
 //Serviço unificado
 const dashboardService = {
@@ -118,8 +118,8 @@ const dashboardService = {
     eventos,
     usuarios,
     /*relatoriosFinanceiros,
-    periodos,
-    configuracoes*/
+    periodos,*/
+    configuracoes
 };
 
 export default dashboardService;
