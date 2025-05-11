@@ -29,3 +29,21 @@ import{
     CheckCircle
 } from '@mui/icons-material';
 import dashboardService from '../../../services/tests/dashboardService'; //Dados mockados
+
+const Usuarios = ({ mostrarMensagem }) => {
+    const [usuarios, setUsuarios] = useState([]);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [selectedUsuario, setSelectedUsuario] = useState(null);
+    const [formData, setFormData] = useState({
+        nome: '',
+        email: '',
+        nivelAcesso: 'admin',
+        status: 'ativo'
+    });
+
+    useEffect(() => {
+        carregarUsuarios();
+    }, []);
+
+    
+}
