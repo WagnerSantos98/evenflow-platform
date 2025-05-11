@@ -27,6 +27,7 @@ import{
     Visibility
 } from '@mui/icons-material';
 import dashboardService from '../../../services/tests/dashboardService'; //Dados mockados
+import { formatarData, formatarMoeda } from '../../../utils/fomatters';
 
 const Eventos = ({ mostrarMensagem }) => {
     const [eventos, setEventos] = useState([]);
@@ -128,30 +129,15 @@ const Eventos = ({ mostrarMensagem }) => {
         if(window.confirm('Tem certeza que deseja excluir este evento?')){
             try{
                 await dashboardService.eventos.excluirEvento(id);
-                mostrarMensagem('Evenot cluído com sucesso!');
+                mostrarMensagem('Evento excluído com sucesso!');
                 carregarEventos();
             }catch(error){
-                mostrarMensagem('Erro ao ecluir evento', error);
+                mostrarMensagem('Erro ao excluir evento', error);
             }
         }
     };
 
-    const formatarData = (data) => {
-        return new Date(data).toLocaleDateString('pt-BR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
-    };
-
-    const formatarMoeda = (valor) => {
-        return new Intl.NumberFormat('pt-BR', {
-            style: 'currency',
-            currency: 'BRL',
-        }).format(valor);
-    };
+    
 
     return(
         <Box>
