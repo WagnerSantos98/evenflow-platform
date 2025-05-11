@@ -26,7 +26,7 @@ import{
     Delete,
     Visibility
 } from '@mui/icons-material';
-import dashboardService from '../../../services/dashboard/dashboardService';
+import dashboardService from '../../../services/tests/dashboardService';
 
 const Eventos = ({ mostrarMensagem }) => {
     const [eventos, setEventos] = useState([]);
@@ -147,7 +147,7 @@ const Eventos = ({ mostrarMensagem }) => {
     };
 
     const formatarMoeda = (valor) => {
-        return new Intl.Numberformat('pt-BR', {
+        return new Intl.NumberFormat('pt-BR', {
             style: 'currency',
             currency: 'BRL',
         }).format(valor);

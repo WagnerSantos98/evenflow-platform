@@ -22,3 +22,7 @@ export const mockEventos = [
     status: 'rascunho'
   }
 ];
+
+export const mockUsuarios = [
+
+];
