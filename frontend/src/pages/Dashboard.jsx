@@ -12,7 +12,7 @@ import {
 import Eventos from '../components/dashboard/eventos/Eventos';
 import Usuarios from '../components/dashboard/usuarios/Usuarios';
 //import RelatoriosFinanceiros from '../components/dashboard/relatorios/RelatoriosFinanceiros';
-//import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
+import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
 
 const Dashboard = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -48,9 +48,9 @@ const Dashboard = () => {
       case 1:
         return <Usuarios mostrarMensagem={mostrarMensagem} />;
       case 2:
-        return <RelatoriosFinanceiros mostrarMensagem={mostrarMensagem} />;
-      case 3:
         return <Configuracoes mostrarMensagem={mostrarMensagem} />;
+      case 3:
+        return <RelatoriosFinanceiros mostrarMensagem={mostrarMensagem} />;
       default:
         return null;
     }
@@ -72,8 +72,8 @@ const Dashboard = () => {
         >
           <Tab label="Eventos" />
           <Tab label="Usuários" />
-          {/*<Tab label="Relatórios" />
-          <Tab label="Configurações" />*/}
+          {/*<Tab label="Relatórios" />*/}
+          <Tab label="Configurações" />
         </Tabs>
       </Paper>
 
