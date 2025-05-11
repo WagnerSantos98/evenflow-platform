@@ -1,13 +1,7 @@
 import { useState, useEffect } from 'react';
 import dashboardService from '../../services/tests/dashboardService'; //Dados mockados
 
-//Constantes e tipos
-    const STATUS_OPTIONS = [
-        { value: 'rascunho', label: 'Rascunho' },
-        { value: 'ativo', label: 'Atvivo' },
-        {value: 'cancelado', label: 'Cancelado' }
-    ];
-
+//Constantes inciais
     const INITIAL_FORM_DATA = {
         titulo: '',
         data: '',
