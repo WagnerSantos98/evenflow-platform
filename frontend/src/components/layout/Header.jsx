@@ -49,7 +49,7 @@ const Header = () => {
 
   const menuItems = [
     { text: 'Eventos', path: '/eventos' },
-    { text: 'Artistas', path: '/artistas' },
+    { text: 'Dashboard', path: '/dashboard' },
     { text: 'Sobre', path: '/sobre' },
   ];
 
