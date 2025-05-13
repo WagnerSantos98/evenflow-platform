@@ -51,6 +51,7 @@ const Header = () => {
     { text: 'Eventos', path: '/eventos' },
     { text: 'Dashboard', path: '/dashboard' },
     { text: 'Sobre', path: '/sobre' },
+    { text: 'Contato', path: '/contato' },
   ];
 
   const drawer = (

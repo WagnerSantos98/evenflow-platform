@@ -11,6 +11,7 @@ import Eventos from './pages/Eventos';
 import EventoDetalhes from './pages/content/EventoDetalhes';
 import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
+import Contato from './pages/Contato';
 import Dashboard from './pages/Dashboard';
 
 function App() {
@@ -26,6 +27,7 @@ function App() {
               <Route path="/eventos" element={<Eventos />} />
               <Route path="/evento/:id" element={<EventoDetalhes />} />
               <Route path="/sobre" element={<Sobre />} />
+              <Route path="/contato" element={<Contato />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
