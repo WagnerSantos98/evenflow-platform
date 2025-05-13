@@ -44,6 +44,7 @@ const useRelatorios = (mostrarMensagem) => {
     };
 
     return{
+        COLORS,
         periodo,
         dataInicio,
         dataFim,
@@ -53,7 +54,8 @@ const useRelatorios = (mostrarMensagem) => {
         resumoFinanceiro,
         setPeriodo,
         setDataInicio,
-        setDataFim
+        setDataFim,
+        carregarDados,
     };
 };
 
