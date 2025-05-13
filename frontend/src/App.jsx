@@ -17,6 +17,7 @@ import Dashboard from './pages/Dashboard';
 import EventoDetalhes from './pages/content/EventoDetalhes';
 import FAQ from './pages/content/FAQ';
 import TermosPoliticas from './pages/content/TermosPolitica';
+import CentralAjuda from './pages/content/CentralAjuda';
 
 function App() {
   return (
@@ -35,8 +36,9 @@ function App() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
 
-              <Route path="/termos-e-politicas" element={<TermosPoliticas />} />
               <Route path="/faq" element={<FAQ />} />
+              <Route path="/termos-e-politicas" element={<TermosPoliticas />} />
+              <Route path="/central-ajuda" element={<CentralAjuda />} />
             </Routes>
           </Layout>
         </Router>
