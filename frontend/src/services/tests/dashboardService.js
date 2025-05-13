@@ -74,33 +74,58 @@ const relatoriosFinanceiros = {
         }
     },
     vendasPorEvento: async (periodo, dataInicio, dataFim) => {
-        const response = await api.get('/relatorios/vendas/evento', {
-            params: { periodo, dataInicio, dataFim }
-        });
-        return response.data;
+        if(USE_MOCK){
+            return mockRelatorios;
+        }else{
+            const response = await api.get('/relatorios/vendas/evento', {
+                params: { periodo, dataInicio, dataFim }
+            });
+            return response.data;
+        }
+        
     },
     vendasPorCategoria: async (periodo, dataInicio, dataFim) => {
-        const response = await api.get('/relatorios/vendas/categoria', {
-            params: { periodo, dataInicio, dataFim }
-        });
-        return response.data;
+        if(USE_MOCK){
+            return mockRelatorios;
+        }else{
+            const response = await api.get('/relatorios/vendas/categoria', {
+                params: { periodo, dataInicio, dataFim }
+            });
+            return response.data;
+        }
+        
     },
     resumoFinanceiro: async (periodo, dataInicio, dataFim) => {
-        const response = await api.get('/relatorios/resumo', {
-            params: { periodo, dataInicio, dataFim }
-        });
-        return response.data;
+        if(USE_MOCK){
+            return mockRelatorios;
+        }else{
+            const response = await api.get('/relatorios/resumo', {
+                params: { periodo, dataInicio, dataFim }
+            });
+            return response.data;
+        }
+        
     }
 };
 //Método de Relatórios - Listagem pelo filtro de Perído
 const periodos = {
     periodoVendas: async (periodo) => {
-        const response = await api.get(`dashboard/relatioro-vendas?periodo=${periodo}`);
-        return response.data;
+        if(USE_MOCK){
+            return mockRelatorios;
+        }else{
+            const response = await api.get(`dashboard/relatioro-vendas?periodo=${periodo}`);
+            return response.data;
+        }
+        
     },
     periodoIngressos: async (periodo) => {
-        const response = await api.get(`dashboard/relatioro-ingressos?periodo=${periodo}`);
-        return response.data;
+        if(USE_MOCK){
+            return mockRelatorios;
+        }else{
+            const response = await api.get(`dashboard/relatioro-ingressos?periodo=${periodo}`);
+            return response.data;
+        }
+        
     }
 };
 

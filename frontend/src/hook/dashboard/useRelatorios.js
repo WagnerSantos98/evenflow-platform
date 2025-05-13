@@ -3,10 +3,10 @@ import dashboarService from '../../services/tests/dashboardService';
 
 //Constantes inciais
 const INITIAL_FORM_DATA = {
-    totalVendas: 0,
-    totalIngressos: 0,
-    mediaTicket: 0,
-    taxaConversao: 0,
+    totalVendas: '',
+    totalIngressos: '',
+    mediaTicket: '',
+    taxaConversao: '',
 };
 
 const useRelatorios = (mostrarMensagem) => {
@@ -37,7 +37,12 @@ const useRelatorios = (mostrarMensagem) => {
             setVendasPorPeriodo(vendasPeriodo);
             setVendasPorEvento(vendasEvento);
             setVendasPorCategoria(vendasCategoria);
-            setResumoFinanceiro(resumo);
+            setResumoFinanceiro({
+                totalVendas: Number(resumo?.totalVendas || 0),
+                totalIngressos: Number(resumo?.totalIngressos || 0),
+                mediaTicket: Number(resumo?.mediaTicket || 0),
+                taxaConversao: Number(resumo?.taxaConversao || 0),
+            });
         }catch(error){
             mostrarMensagem('Erro ao carregar dados financeiros', error);
         }

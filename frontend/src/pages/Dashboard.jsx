@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import Eventos from '../components/dashboard/eventos/Eventos';
 import Usuarios from '../components/dashboard/usuarios/Usuarios';
-//import RelatoriosFinanceiros from '../components/dashboard/relatorios/RelatoriosFinanceiros';
+import Relatorios from '../components/dashboard/relatorios/Relatorios';
 import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
 
 const Dashboard = () => {
@@ -48,9 +48,9 @@ const Dashboard = () => {
       case 1:
         return <Usuarios mostrarMensagem={mostrarMensagem} />;
       case 2:
-        return <Configuracoes mostrarMensagem={mostrarMensagem} />;
+        return <Relatorios mostrarMensagem={mostrarMensagem} />;
       case 3:
-        return <RelatoriosFinanceiros mostrarMensagem={mostrarMensagem} />;
+        return <Configuracoes mostrarMensagem={mostrarMensagem} />;
       default:
         return null;
     }
@@ -72,7 +72,7 @@ const Dashboard = () => {
         >
           <Tab label="Eventos" />
           <Tab label="Usuários" />
-          {/*<Tab label="Relatórios" />*/}
+          <Tab label="Relatórios" />
           <Tab label="Configurações" />
         </Tabs>
       </Paper>

@@ -52,6 +52,47 @@ export const mockConfiguracoes = [
   }
 ];
 
-export const mockRelatorios = [
+export const mockResumoFinanceiro = {
+  totalVendas: 2500,         
+  totalIngressos: 250,       
+  mediaTicket: 25,           
+  taxaConversao: 0.10        // decimal entre 0 e 1
+};
 
+export const mockVendasPorPeriodo = [
+  { periodo: 'Semana 1', valor: 500 },
+  { periodo: 'Semana 2', valor: 700 },
+  { periodo: 'Semana 3', valor: 800 },
+  { periodo: 'Semana 4', valor: 500 },
 ];
+
+export const mockVendasPorCategoria = [
+  { categoria: 'Show', valor: 1500 },
+  { categoria: 'Teatro', valor: 600 },
+  { categoria: 'Cinema', valor: 400 },
+];
+
+export const mockVendasPorEvento = [
+  {
+    id: '1',
+    nome: 'Rock in Rio',
+    ingressosVendidos: 120,
+    valorTotal: 1800,
+    ticketMedio: 15,
+  },
+  {
+    id: '2',
+    nome: 'Teatro Municipal',
+    ingressosVendidos: 80,
+    valorTotal: 800,
+    ticketMedio: 10,
+  },
+  {
+    id: '3',
+    nome: 'Sessão de Cinema',
+    ingressosVendidos: 50,
+    valorTotal: 500,
+    ticketMedio: 10,
+  },
+];
+
