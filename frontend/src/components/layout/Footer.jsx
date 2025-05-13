@@ -103,7 +103,7 @@ const Footer = () => {
               Dúvidas Frequentes
             </FooterLink>
             
-            <FooterLink component={RouterLink} to="/termos-politicas">
+            <FooterLink component={RouterLink} to="/termos-e-politicas">
               Termos e Políticas
             </FooterLink>
             

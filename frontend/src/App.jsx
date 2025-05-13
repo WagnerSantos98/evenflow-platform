@@ -34,7 +34,7 @@ function App() {
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
 
-              <Route path="/termos-politicas" element={<TermosPoliticas />} />
+              <Route path="/termos-e-politicas" element={<TermosPoliticas />} />
             </Routes>
           </Layout>
         </Router>
