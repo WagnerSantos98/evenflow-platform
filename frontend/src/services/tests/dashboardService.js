@@ -1,4 +1,4 @@
-import { mockEventos, mockUsuarios, mockConfiguracoes } from '../../mock/dashboardMock';
+import { mockEventos, mockUsuarios, mockConfiguracoes, mockRelatorios } from '../../mock/dashboardMock';
 import api from '../api';
 
 const USE_MOCK = true;
@@ -62,12 +62,16 @@ const usuarios = {
 };
 
 //Método de Relatórios Financeiros - Listagem das vendas (Período, Evento, Categoria e Resumo)
-/*const relatoriosFinanceiros = {
+const relatoriosFinanceiros = {
     vendasPorPeriodo: async (periodo, dataInicio, dataFim) => {
-        const response = await api.get('/relatorios/vendas/periodo', {
-            params: { periodo, dataInicio, dataFim }
-        });
-        return response.data;
+        if(USE_MOCK){
+            return mockRelatorios;
+        }else{
+            const response = await api.get('/relatorios/vendas/periodo', {
+                params: { periodo, dataInicio, dataFim }
+            });
+            return response.data;
+        }
     },
     vendasPorEvento: async (periodo, dataInicio, dataFim) => {
         const response = await api.get('/relatorios/vendas/evento', {
@@ -75,7 +79,7 @@ const usuarios = {
         });
         return response.data;
     },
-    vendarPorCategoria: async (periodo, dataInicio, dataFim) => {
+    vendasPorCategoria: async (periodo, dataInicio, dataFim) => {
         const response = await api.get('/relatorios/vendas/categoria', {
             params: { periodo, dataInicio, dataFim }
         });
@@ -98,7 +102,7 @@ const periodos = {
         const response = await api.get(`dashboard/relatioro-ingressos?periodo=${periodo}`);
         return response.data;
     }
-};*/
+};
 
 //Módulo de Configurações - Obter e atualizar
 const configuracoes = {
@@ -121,8 +125,8 @@ const dashboardService = {
     //estatisticas,
     eventos,
     usuarios,
-    /*relatoriosFinanceiros,
-    periodos,*/
+    relatoriosFinanceiros,
+    periodos,
     configuracoes
 };
 
