@@ -14,7 +14,7 @@ const useRelatorios = (mostrarMensagem) => {
     const [dataInicio, setDataInicio] = useState('');
     const [dataFim, setDataFim] = useState('');
     const [vendasPorPeriodo, setVendasPorPeriodo] = useState([]);
-    const [vedasPorEvento, setVendasPorEvento] = useState([]);
+    const [vendasPorEvento, setVendasPorEvento] = useState([]);
     const [vendasPorCategoria, setVendasPorCategoria] = useState([]);
     const [resumoFinanceiro, setResumoFinanceiro] = useState(INITIAL_FORM_DATA);
 
@@ -41,7 +41,20 @@ const useRelatorios = (mostrarMensagem) => {
         }catch(error){
             mostrarMensagem('Erro ao carregar dados financeiros', error);
         }
-    }
+    };
+
+    return{
+        periodo,
+        dataInicio,
+        dataFim,
+        vendasPorPeriodo,
+        vendasPorEvento,
+        vendasPorCategoria,
+        resumoFinanceiro,
+        setPeriodo,
+        setDataInicio,
+        setDataFim
+    };
 };
 
 export default useRelatorios;
