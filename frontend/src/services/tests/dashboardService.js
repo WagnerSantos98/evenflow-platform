@@ -1,4 +1,4 @@
-import { mockEventos, mockUsuarios, mockConfiguracoes, mockRelatorios } from '../../mock/dashboardMock';
+import { mockEventos, mockUsuarios, mockConfiguracoes, mockResumoFinanceiro, mockVendasPorPeriodo, mockVendasPorCategoria, mockVendasPorEvento } from '../../mock/dashboardMock';
 import api from '../api';
 
 const USE_MOCK = true;
@@ -65,7 +65,7 @@ const usuarios = {
 const relatoriosFinanceiros = {
     vendasPorPeriodo: async (periodo, dataInicio, dataFim) => {
         if(USE_MOCK){
-            return mockRelatorios;
+            return mockResumoFinanceiro;
         }else{
             const response = await api.get('/relatorios/vendas/periodo', {
                 params: { periodo, dataInicio, dataFim }
@@ -75,7 +75,7 @@ const relatoriosFinanceiros = {
     },
     vendasPorEvento: async (periodo, dataInicio, dataFim) => {
         if(USE_MOCK){
-            return mockRelatorios;
+            return mockVendasPorEvento;
         }else{
             const response = await api.get('/relatorios/vendas/evento', {
                 params: { periodo, dataInicio, dataFim }
@@ -86,7 +86,7 @@ const relatoriosFinanceiros = {
     },
     vendasPorCategoria: async (periodo, dataInicio, dataFim) => {
         if(USE_MOCK){
-            return mockRelatorios;
+            return mockVendasPorCategoria;
         }else{
             const response = await api.get('/relatorios/vendas/categoria', {
                 params: { periodo, dataInicio, dataFim }
@@ -97,7 +97,7 @@ const relatoriosFinanceiros = {
     },
     resumoFinanceiro: async (periodo, dataInicio, dataFim) => {
         if(USE_MOCK){
-            return mockRelatorios;
+            return mockResumoFinanceiro;
         }else{
             const response = await api.get('/relatorios/resumo', {
                 params: { periodo, dataInicio, dataFim }
@@ -111,7 +111,7 @@ const relatoriosFinanceiros = {
 const periodos = {
     periodoVendas: async (periodo) => {
         if(USE_MOCK){
-            return mockRelatorios;
+            return mockVendasPorPeriodo;
         }else{
             const response = await api.get(`dashboard/relatioro-vendas?periodo=${periodo}`);
             return response.data;
@@ -120,7 +120,7 @@ const periodos = {
     },
     periodoIngressos: async (periodo) => {
         if(USE_MOCK){
-            return mockRelatorios;
+            return mockResumoFinanceiro;
         }else{
             const response = await api.get(`dashboard/relatioro-ingressos?periodo=${periodo}`);
             return response.data;
