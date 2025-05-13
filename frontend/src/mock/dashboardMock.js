@@ -51,3 +51,7 @@ export const mockConfiguracoes = [
     
   }
 ];
+
+export const mockRelatorios = [
+
+];
