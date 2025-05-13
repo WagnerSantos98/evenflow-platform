@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 
 //Páginas Content
 import EventoDetalhes from './pages/content/EventoDetalhes';
+import FAQ from './pages/content/FAQ';
 import TermosPoliticas from './pages/content/TermosPolitica';
 
 function App() {
@@ -35,6 +36,7 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
 
               <Route path="/termos-e-politicas" element={<TermosPoliticas />} />
+              <Route path="/faq" element={<FAQ />} />
             </Routes>
           </Layout>
         </Router>
