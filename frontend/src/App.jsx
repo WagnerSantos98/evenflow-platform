@@ -8,11 +8,14 @@ import { GlobalStyles } from './styles/global/GlobalStyles';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Eventos from './pages/Eventos';
-import EventoDetalhes from './pages/content/EventoDetalhes';
 import Auth from './pages/Auth';
 import Sobre from './pages/Sobre';
 import Contato from './pages/Contato';
 import Dashboard from './pages/Dashboard';
+
+//Páginas Content
+import EventoDetalhes from './pages/content/EventoDetalhes';
+import TermosPoliticas from './pages/content/TermosPolitica';
 
 function App() {
   return (
@@ -30,6 +33,8 @@ function App() {
               <Route path="/contato" element={<Contato />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/dashboard" element={<Dashboard />} />
+
+              <Route path="/termos-politicas" element={<TermosPoliticas />} />
             </Routes>
           </Layout>
         </Router>
