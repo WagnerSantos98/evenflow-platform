@@ -61,32 +61,24 @@ const RecursosOrganizadores = () => {
       title: 'Dashboard Analítico',
       description: 'Acompanhe métricas importantes como vendas, engajamento e satisfação dos participantes.',
       features: ['Relatórios em tempo real', 'Análise de público', 'Métricas de vendas'],
-      action: 'Acessar Dashboard',
-      link: '/dashboard',
     },
     {
       icon: <Campaign sx={{ fontSize: 30 }} />,
       title: 'Ferramentas de Marketing',
       description: 'Promova seus eventos com ferramentas integradas de marketing digital.',
       features: ['E-mail marketing', 'Redes sociais', 'Anúncios personalizados'],
-      action: 'Explorar Ferramentas',
-      link: '/marketing',
     },
     {
       icon: <Payment sx={{ fontSize: 30 }} />,
       title: 'Gestão Financeira',
       description: 'Gerencie pagamentos, reembolsos e relatórios financeiros de forma integrada.',
       features: ['Controle de ingressos', 'Gestão de reembolsos', 'Relatórios financeiros'],
-      action: 'Ver Financeiro',
-      link: '/financeiro',
     },
     {
       icon: <Security sx={{ fontSize: 30 }} />,
       title: 'Segurança e Compliance',
       description: 'Ferramentas para garantir a segurança e conformidade dos seus eventos.',
       features: ['LGPD', 'Segurança de dados', 'Certificações'],
-      action: 'Saiba Mais',
-      link: '/seguranca',
     },
     
     {
@@ -94,24 +86,18 @@ const RecursosOrganizadores = () => {
       title: 'Suporte Especializado',
       description: 'Acesso a uma equipe dedicada para ajudar na organização dos seus eventos.',
       features: ['Suporte prioritário', 'Consultoria', 'Treinamentos'],
-      action: 'Falar com Especialista',
-      link: '/suporte',
     },
     {
       icon: <Event sx={{ fontSize: 30 }} />,
       title: 'Checklist de Eventos',
       description: 'Listas de verificação e templates para planejamento completo de eventos.',
       features: ['Templates', 'Checklists', 'Cronogramas'],
-      action: 'Ver Templates',
-      link: '/templates',
     },
     {
       icon: <People sx={{ fontSize: 30 }} />,
       title: 'Gestão de Participantes',
       description: 'Ferramentas para gerenciar inscrições, credenciamento e experiência dos participantes.',
       features: ['Credenciamento', 'Badges', 'Certificados'],
-      action: 'Gerenciar Participantes',
-      link: '/participantes',
     },
   ];
 
@@ -158,17 +144,6 @@ const RecursosOrganizadores = () => {
                     ))}
                   </Box>
                 </CardContentWrapper>
-                <CardActions>
-                  <Button
-                    component={RouterLink}
-                    to={recurso.link}
-                    variant="contained"
-                    color="primary"
-                    fullWidth
-                  >
-                    {recurso.action}
-                  </Button>
-                </CardActions>
               </ResourceCard>
             </Grid>
           ))}
