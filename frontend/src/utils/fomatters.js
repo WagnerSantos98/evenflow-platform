@@ -16,3 +16,8 @@ export const formatarMoeda = (valor) => {
         currency: 'BRL'
     }).format(valor);
 };
+
+//Formatar percentual
+export const formatarPercentual = (valor) => {
+    return `${(valor * 100).toFixed(2)}%`
+};
