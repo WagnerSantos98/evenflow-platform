@@ -120,7 +120,7 @@ const Footer = () => {
             <FooterLink component={RouterLink} to="/blog">
               Blog
             </FooterLink>
-            <FooterLink component={RouterLink} to="/parceiros">
+            <FooterLink component={RouterLink} to="/seja-parceiro">
               Seja Parceiro
             </FooterLink>
             <FooterLink component={RouterLink} to="/suporte">
