@@ -22,6 +22,7 @@ import RecursosOrganizadores from './pages/content/RecursosOrganizadores';
 import Suporte from './pages/content/Suporte';
 import Blog from './pages/content/Blog';
 import SejaParceiro from './pages/content/SejaParceiro';
+import Chat from './pages/content/Chat';
 
 function App() {
   return (
@@ -47,6 +48,7 @@ function App() {
               <Route path="/suporte" element={<Suporte />} />
               <Route path="/blog" element={<Blog />} />
               <Route path="/seja-parceiro" element={<SejaParceiro />} />
+              <Route path="/chat" element={<Chat />} />
             </Routes>
           </Layout>
         </Router>
