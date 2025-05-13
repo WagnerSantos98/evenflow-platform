@@ -18,6 +18,7 @@ import EventoDetalhes from './pages/content/EventoDetalhes';
 import FAQ from './pages/content/FAQ';
 import TermosPoliticas from './pages/content/TermosPolitica';
 import CentralAjuda from './pages/content/CentralAjuda';
+import RecursosOrganizadores from './pages/content/RecursosOrganizadores';
 
 function App() {
   return (
@@ -39,6 +40,7 @@ function App() {
               <Route path="/faq" element={<FAQ />} />
               <Route path="/termos-e-politicas" element={<TermosPoliticas />} />
               <Route path="/central-ajuda" element={<CentralAjuda />} />
+              <Route path="/recursos" element={<RecursosOrganizadores />} />
             </Routes>
           </Layout>
         </Router>
