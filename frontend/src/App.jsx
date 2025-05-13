@@ -19,6 +19,8 @@ import FAQ from './pages/content/FAQ';
 import TermosPoliticas from './pages/content/TermosPolitica';
 import CentralAjuda from './pages/content/CentralAjuda';
 import RecursosOrganizadores from './pages/content/RecursosOrganizadores';
+import Suporte from './pages/content/Suporte';
+import Blog from './pages/content/Blog';
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
               <Route path="/termos-e-politicas" element={<TermosPoliticas />} />
               <Route path="/central-ajuda" element={<CentralAjuda />} />
               <Route path="/recursos" element={<RecursosOrganizadores />} />
+              <Route path="/suporte" element={<Suporte />} />
+              <Route path="/blog" element={<Blog />} />
             </Routes>
           </Layout>
         </Router>
