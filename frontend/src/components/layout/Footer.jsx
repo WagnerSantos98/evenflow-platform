@@ -114,17 +114,17 @@ const Footer = () => {
             <Typography variant="h6" gutterBottom>
               Para Organizadores
             </Typography>
-            <FooterLink component={RouterLink} to="/criar-evento">
-              Criar Evento
-            </FooterLink>
-            <FooterLink component={RouterLink} to="/parceiros">
-              Seja Parceiro
-            </FooterLink>
             <FooterLink component={RouterLink} to="/recursos">
               Recursos
             </FooterLink>
             <FooterLink component={RouterLink} to="/blog">
               Blog
+            </FooterLink>
+            <FooterLink component={RouterLink} to="/parceiros">
+              Seja Parceiro
+            </FooterLink>
+            <FooterLink component={RouterLink} to="/parceiros">
+              Suporte
             </FooterLink>
           </Grid>
 
