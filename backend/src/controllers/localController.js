@@ -1,5 +1,7 @@
 const Local = require('../models/Local');
 const { Op, json } = require('sequelize');
+const s3Service = require('../services/s3Service');
+const { formatarDocumento, formatarCEP } = require('../utils/formatadores');
 
 // Classe LocalController
 class LocalController {
@@ -12,6 +14,7 @@ class LocalController {
             }
 
             const { nome, email, telefone, tipoDocumento, documento, endereco, capacidade, descricao, criadoPor } = req.body;
+            let foto = null;
 
             // Verifica se o local já existe pelo email ou documento
             const localExistente = await Local.findOne({
@@ -23,6 +26,10 @@ class LocalController {
             if (localExistente) {
                 return res.status(400).json({ mensagem: 'Email ou documento já cadastrado' });
             }
+
+            // Formatar dados
+            const documentoFormatado = formatarDocumento(documento, tipoDocumento);
+            const cepFormatado = endereco.cep ? formatarCEP(endereco.cep) : null;
 
             // Cria o novo local sem vinculação com usuário
             const novoLocal = await Local.create({

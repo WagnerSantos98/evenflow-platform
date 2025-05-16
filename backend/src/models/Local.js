@@ -25,7 +25,7 @@ const Local = sequelize.define('Local', {
         allowNull: true
     },
     tipoDocumento:{
-        type: DataTypes.ENUM('cpf', 'cnpj'),
+        type: DataTypes.ENUM('cnpj'),
         allowNull: false
     },
     documento:{
