@@ -2,6 +2,7 @@ const { Evento, Local } = require('../models/associations/index');
 const { Op } = require('sequelize');
 const { validationResult } = require('express-validator');
 const { createStripeProduct } = require('..//services/stripeService');
+const s3Service = require('../services/s3Service');
 
 class EventoController {
 
@@ -17,7 +18,6 @@ class EventoController {
                 nome,
                 descricao,
                 data,
-                foto,
                 precoIngresso,
                 ingressosDisponiveis,
                 tipoEvento,
@@ -26,6 +26,7 @@ class EventoController {
                 status,
                 localId,
             } = request.body;
+            let foto = null;
 
             //Validando se o usuário está autenticado e autorizado
             if (!request.usuario || !['admin', 'organizador'].includes(request.usuario.nivelAcesso)) {
@@ -87,8 +88,26 @@ class EventoController {
                 stripePriceId: stripeProduct?.default_price
             });
 
-            response.status(201).json(novoEvento);
+            //Se houver arquivo, fazer upload para S3
+            if(request.file){
+                if(!request.file.mimetype.startsWith('image/')){
+                    return response.status(400).json({ mensagem: 'O arquivo enviado não é uma imagem válida' });
+                }
 
+                const file = {
+                    name: request.file.originalname,
+                    data: request.file.buffer,
+                    mimetype: request.file.mimetype
+                };
+
+                const uploadResult = await s3Service.uploadImagemEvento(novoEvento.id, file);
+                foto = uploadResult.Location;
+
+                //Atualizar evento com a URL da imagem
+                await novoEvento.update({ foto });
+            }
+
+            response.status(201).json(novoEvento);
         } catch (error) {
             response.status(500).send({mensagem: 'Houve um erro ao criar o evento: ', erro: error.message})
         }
@@ -181,6 +200,25 @@ class EventoController {
                 }
             });
 
+            //Se houver arquivo, fazer upload  para S3
+            if(req.file){
+                if(!req.file.mimetype.startsWith('image/')){
+                    return res.status(400).json({ mensagem: 'o arquivo enviado não é uma imagem válida' });
+                }
+            
+                const file = {
+                    name: req.file.originalname,
+                    data: req.file.buffer,
+                    mimetype: req.file.mimetype
+                };
+            
+                const uploadResult = await s3Service.uploadAvatarUsuario(usuario.id, file);
+                foto = uploadResult.Location;
+            
+                //Atualizar usuário com a URL da imagem
+                await usuario.update({ foto });
+            }
+
             // Atualizar o evento com a cláusula where
             await Evento.update(dadosAtualizados, {
                 where: { id: request.params.id }
@@ -207,6 +245,9 @@ class EventoController {
             if (!request.usuario || !['admin', 'organizador'].includes(request.usuario.nivelAcesso)) {
                 return response.status(403).send({ mensagem: 'Você não tem permissão para realizar esta ação' });
             }
+
+            //Deletar para do evento no S3
+            await s3Service.deletarEventoPeloId(evento.id);
 
             await evento.destroy();
             response.json({ mensagem: 'O Evento foi deletado com sucesso!' });
