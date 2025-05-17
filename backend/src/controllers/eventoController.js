@@ -201,22 +201,22 @@ class EventoController {
             });
 
             //Se houver arquivo, fazer upload  para S3
-            if(req.file){
-                if(!req.file.mimetype.startsWith('image/')){
-                    return res.status(400).json({ mensagem: 'o arquivo enviado não é uma imagem válida' });
+            if(request.file){
+                if(!request.file.mimetype.startsWith('image/')){
+                    return response.status(400).json({ mensagem: 'o arquivo enviado não é uma imagem válida' });
                 }
             
                 const file = {
-                    name: req.file.originalname,
-                    data: req.file.buffer,
-                    mimetype: req.file.mimetype
+                    name: request.file.originalname,
+                    data: request.file.buffer,
+                    mimetype: request.file.mimetype
                 };
             
-                const uploadResult = await s3Service.uploadAvatarUsuario(usuario.id, file);
+                const uploadResult = await s3Service.uploadImagemEvento(evento.id, file);
                 foto = uploadResult.Location;
             
                 //Atualizar usuário com a URL da imagem
-                await usuario.update({ foto });
+                await evento.update({ foto });
             }
 
             // Atualizar o evento com a cláusula where

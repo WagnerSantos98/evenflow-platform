@@ -7,12 +7,12 @@ const validarArquivoImagem = (req, res, next) => {
         return next();
     }
 
-    const tiposPermitidos = ['image/jpeg', 'image/png', 'image/gif'];
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
     const tamanhoMaximo = 5 * 1024 * 1024; // 5MB
 
     if (!tiposPermitidos.includes(req.file.mimetype)) {
         return res.status(400).json({ 
-            mensagem: 'Tipo de arquivo não permitido. Apenas imagens JPG, PNG e GIF são aceitas.' 
+            mensagem: 'Tipo de arquivo não permitido. Apenas imagens JPEG, JPG, e PNG são aceitas.' 
         });
     }
 

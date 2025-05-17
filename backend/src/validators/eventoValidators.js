@@ -1,6 +1,28 @@
 const { body, query } = require('express-validator');
 const moment = require('moment');
 
+const validarArquivoImagem = (req, res, next) => {
+    if(!req.file){
+        return next();
+    }
+
+    const tiposPermitidos = ['image/jpeg', 'image/jpg', 'image/png'];
+    const tamanhoMaximo = 5 * 1024 * 1024; //5MB
+
+    if(!tiposPermitidos.includes(req.fie.mimetype)){
+        return res.status(400).json({
+            mensagem: 'Tipo de arquivo não permitido. Apenas imagens JPEG, JPG, e PNG são aceitas.'
+        });
+    }
+
+    if(req.file.size > tamanhoMaximo){
+        return res.status(400).json({
+            mensagem: 'Arquivo muito grande. O tamanho máximo permitido é 5MB.'
+        })
+    }
+    next();
+}
+
 const validarCriacaoEvento = [
     body('nome').notEmpty().withMessage('O nome do evento é obrigatório.'),
     //body('descricao').withMessage('A descrição do evento é obrigatória.'),
@@ -110,5 +132,6 @@ const validarConsultaEventos = [
 module.exports = {
     validarCriacaoEvento,
     validarAtualizacaoEvento,
-    validarConsultaEventos
+    validarConsultaEventos,
+    validarArquivoImagem
 };
