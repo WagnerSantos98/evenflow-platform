@@ -2,20 +2,23 @@ const multer = require('multer');
 
 const storage = multer.memoryStorage();
 
-async function filtrarArquivo(req, file, cb) {
-    if(file.mimetype.startsWith('image/')){
+function fileFilter(req, file, cb) {
+    if(file.mimetype.startsWith('image/')) {
         cb(null, true);
-    }else{
+    } else {
         cb(new Error('Apenas arquivos de imagem são permitidos!'), false);
     }
 }
 
 const upload = multer({
     storage: storage,
-    fileFilter: filtrarArquivo,
+    fileFilter: fileFilter,
     limits: {
-        fileSize: 5 * 1024 * 1024
+        fileSize: 5 * 1024 * 1024 // 5MB
     }
-}).single('foto');
+}).fields([
+    { name: 'capa', maxCount: 1 },    // Campo para a imagem de capa
+    { name: 'galeria', maxCount: 10 } // Campo para as imagens da galeria
+]);
 
 module.exports = { upload };
