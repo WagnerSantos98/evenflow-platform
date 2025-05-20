@@ -60,35 +60,36 @@ const deletarPastaUsuario = async(usuarioId) => {
     }
 };
 
+// Deletar pasta do evento no R2
 const deletarPastaEvento = async(eventoId) => {
-    try{
-        //Listar todos os objetos na pasta do evento
+    try {
+        // Listar todos os objetos na pasta do usuário
         const listParams = {
             Bucket: process.env.CF_BUCKET_NAME,
-            Prefix: `eventos/${eventoId}`
+            Prefix: `eventos/${eventoId}/`
         };
 
         const objects = await s3.send(new ListObjectsV2Command(listParams));
 
-        if(!objects.Contents || objects.Contents.length === 0){
+        if (!objects.Contents || objects.Contents.length === 0) {
             return; // Caso a pasta esteja vazia
         }
 
-        //Preparar array de objetos para deletar
+        // Preparar array de objetos para deletar
         const deleteParams = {
             Bucket: process.env.CF_BUCKET_NAME,
-            Delete:{
-                Objects: objects.Contents.map(obj => ({ Key: obj.key }))
+            Delete: {
+                Objects: objects.Contents.map(obj => ({ Key: obj.Key }))
             }
         };
 
-        //Deletar todoso os objetos
+        // Deletar todos os objetos
         await s3.send(new DeleteObjectsCommand(deleteParams));
-    }catch(error){
+    } catch(error) {
         console.error('Erro ao deletar pasta do evento no R2:', error);
         throw error;
     }
-}
+};
 
 module.exports = {
     // Upload de imagem de perfil do usuário
