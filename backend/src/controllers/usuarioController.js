@@ -135,7 +135,12 @@ class UsuarioController{
             //Se houver arquivo, fazer upload  para S3
             if(req.file){
                 if(!req.file.mimetype.startsWith('image/')){
-                    return res.status(400).json({ mensagem: 'o arquivo enviado não é uma imagem válida' });
+                    return res.status(400).json({ mensagem: 'O arquivo enviado não é uma imagem válida' });
+                }
+
+                //Excluir imagem anterior, se houver
+                if(usuario.foto){
+                    await s3Service.excluirImagem(usuario.foto);
                 }
 
                 const file = {
