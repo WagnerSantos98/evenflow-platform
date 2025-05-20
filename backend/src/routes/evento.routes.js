@@ -11,8 +11,8 @@ router.get('/:id', eventoController.buscarEventoPorId);
 
 
 // Rotas protegidas
-router.post('/', autenticar, validarCriacaoEvento, upload, eventoController.criarEvento); // Criar evento
-router.put('/:id', autenticar, validarAtualizacaoEvento, upload, eventoController.atualizarEventoPeloId)
+router.post('/', autenticar, upload, validarCriacaoEvento, eventoController.criarEvento); // Criar evento
+router.put('/:id', autenticar, validarAtualizacaoEvento, eventoController.atualizarEventoPeloId)
 router.delete('/:id', autenticar, eventoController.deletarEventoPeloId);
 
 module.exports = router;
