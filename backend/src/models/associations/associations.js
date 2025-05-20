@@ -6,12 +6,17 @@ const Avaliacao = require('../Avaliacao');
 const Notificacao = require('../Notificacao'); 
 //const LinkPagamento = require('../LinkPagamento');
 const CheckoutSession = require('../CheckoutSession');
+const GaleriaEvento = require('../GaleriaEvento');
 
 
 const setupAssociations = () => {
     //Relacionamento entre Evento e Local
     Evento.belongsTo(Local, { as: 'local', foreignKey: 'localId', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
     Local.hasMany(Evento, { as: 'eventos', foreignKey: 'localId', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
+
+    //Relacionamento entre Galeria e Evento
+    GaleriaEvento.belongsTo(Evento, { as: 'evento', foreignKey:'eventoId', onDelete: 'SET NULL', onUpdate: 'CASCADE'});
+    Evento.hasMany(GaleriaEvento, { as: 'galeria', foreignKey: 'eventoId', onDelete: 'SET NULL', onUpdate: 'CASCADE'});
 
     //Relacionamento entre Evento e Usuário
     Evento.belongsTo(Usuario, { as: 'organizador', foreignKey: 'organizadorId', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
