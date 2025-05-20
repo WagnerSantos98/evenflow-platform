@@ -1,4 +1,4 @@
-const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, GetObjectCommand, DeleteObjectCommand } = require("@aws-sdk/client-s3");
 const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
@@ -57,6 +57,23 @@ const deletarPastaUsuario = async(usuarioId) => {
     } catch(error) {
         console.error('Erro ao deletar pasta do usuário no R2:', error);
         throw error;
+    }
+};
+
+//Excluir imagem do usuário
+const excluirImagem = async (urlCompleta) => {
+    try {
+        const url = new URL(urlCompleta);
+        const key = decodeURIComponent(url.pathname.substring(1)); // remove a barra inicial
+
+        const params = {
+            Bucket: process.env.CF_BUCKET_NAME,
+            Key: key
+        };
+
+        await s3.send(new DeleteObjectCommand(params));
+    } catch (error) {
+        console.error('Erro ao excluir imagem do R2:', error);
     }
 };
 
@@ -129,5 +146,6 @@ module.exports = {
     },
 
     deletarPastaUsuario,
-    deletarPastaEvento
+    deletarPastaEvento,
+    excluirImagem
 };
