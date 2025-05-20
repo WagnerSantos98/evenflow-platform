@@ -1,7 +1,7 @@
-const { Evento, Local } = require('../models/associations/index');
+const { Evento, Local, GaleriaEvento } = require('../models/associations/index');
 const { Op } = require('sequelize');
 const { validationResult } = require('express-validator');
-const { createStripeProduct } = require('..//services/stripeService');
+const { createStripeProduct } = require('../services/stripeService');
 const s3Service = require('../services/s3Service');
 
 class EventoController {
@@ -26,7 +26,6 @@ class EventoController {
                 status,
                 localId,
             } = request.body;
-            let foto = null;
 
             //Validando se o usuário está autenticado e autorizado
             if (!request.usuario || !['admin', 'organizador'].includes(request.usuario.nivelAcesso)) {
@@ -40,14 +39,6 @@ class EventoController {
                     return response.status(404).send({ mensagem: 'Local não encontrado.' });
                 }
             }
-
-            // Verificar se o organizador existe
-            // if (organizadorId) {
-            //     const orgExistente = await User.findByPk(organizadorId);
-            //     if (!orgExistente) {
-            //         return response.status(404).send({ mensagem: 'O Organizador deste evento não foi encontrado!' });
-            //     }
-            // }
 
             // Verificar duplicidade de evento
             const eventoExistente = await Evento.findOne({
@@ -72,41 +63,60 @@ class EventoController {
             }
            
             const novoEvento = await Evento.create({
-                nome, 
-                descricao, 
-                data, 
-                foto, 
-                precoIngresso, 
-                ingressosDisponiveis, 
-                tipoEvento, 
-                categoria, 
-                classificacaoEtaria, 
+                nome,
+                descricao,
+                data,
+                precoIngresso,
+                ingressosDisponiveis,
+                tipoEvento,
+                categoria,
+                classificacaoEtaria,
                 status,
                 localId,
                 organizadorId: request.usuario.id,
-                stripeProductId: stripeProduct?.id,
-                stripePriceId: stripeProduct?.default_price
+                stripeProductId: stripeProduct?.id || null,
+                stripePriceId: stripeProduct?.default_price || null
             });
 
-            //Se houver arquivo, fazer upload para S3
-            if(request.file){
-                if(!request.file.mimetype.startsWith('image/')){
-                    return response.status(400).json({ mensagem: 'O arquivo enviado não é uma imagem válida' });
-                }
+            
 
-                const file = {
-                    name: request.file.originalname,
-                    data: request.file.buffer,
-                    mimetype: request.file.mimetype
-                };
-
-                const uploadResult = await s3Service.uploadImagemEvento(novoEvento.id, file);
-                foto = uploadResult.Location;
-
-                //Atualizar evento com a URL da imagem
-                await novoEvento.update({ foto });
+            //Upload da capa
+            const capaFile = request.files?.capa?.[0];
+            if (!capaFile || !capaFile.buffer || !capaFile.mimetype.startsWith('image/')) {
+                return response.status(400).json({ mensagem: 'Imagem de capa inválida ou não enviada.' });
             }
 
+            const capaData = {
+                name: capaFile.originalname,
+                data: capaFile.buffer,
+                mimetype: capaFile.mimetype
+            };
+            const fotoCapa = await s3Service.uploadImagemEvento(novoEvento.id, capaData, false);
+            await novoEvento.update({ foto: fotoCapa });
+
+            //Upload da galeria
+            const fotosGaleria = [];
+            if (request.files?.galeria?.length > 0) {
+                for (const galeriaFile of request.files.galeria) {
+                    if (galeriaFile.mimetype?.startsWith('image/')) {
+                        const galeriaData = {
+                            name: galeriaFile.originalname,
+                            data: galeriaFile.buffer,
+                            mimetype: galeriaFile.mimetype
+                        };
+                        const fotoUrl = await s3Service.uploadImagemEvento(novoEvento.id, galeriaData, true);
+                        fotosGaleria.push(fotoUrl);
+                    }
+                }
+
+                await Promise.all(fotosGaleria.map(url =>
+                    GaleriaEvento.create({
+                        eventoId: novoEvento.id,
+                        urlImagem: url
+                    })
+                ));
+            }
+            
             response.status(201).json(novoEvento);
         } catch (error) {
             response.status(500).send({mensagem: 'Houve um erro ao criar o evento: ', erro: error.message})
@@ -139,7 +149,7 @@ class EventoController {
                         model: Local,
                         as: 'local',
                         attributes: ['id', 'nome', 'endereco']
-                    }
+                    },
                 ],
                 limit: parseInt(limite),
                 offset: parseInt(offset),
@@ -212,8 +222,8 @@ class EventoController {
                     mimetype: request.file.mimetype
                 };
             
-                const uploadResult = await s3Service.uploadImagemEvento(evento.id, file);
-                foto = uploadResult.Location;
+                foto = await s3Service.uploadImagemEvento(evento.id, file);
+                
             
                 //Atualizar usuário com a URL da imagem
                 await evento.update({ foto });
