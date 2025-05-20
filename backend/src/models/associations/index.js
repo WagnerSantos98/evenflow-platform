@@ -9,6 +9,7 @@ const Ingresso = require('../Ingresso');
 const Avaliacao = require('../Avaliacao');
 const Notificacao = require('../Notificacao');
 const CheckoutSession = require('../CheckoutSession');
+const GaleriaEvento = require('../GaleriaEvento');
 
 //Configurar os relacionamentos
 setupAssociations();
@@ -21,5 +22,6 @@ module.exports = {
     Ingresso,
     Avaliacao,
     Notificacao,
-    CheckoutSession
+    CheckoutSession,
+    GaleriaEvento
 }
