@@ -54,14 +54,41 @@ const deletarPastaUsuario = async(usuarioId) => {
 
         // Deletar todos os objetos
         await s3.send(new DeleteObjectsCommand(deleteParams));
-
-        // Nota: No R2/S3 não é necessário deletar a "pasta" pois ela é apenas um prefixo
-        // que desaparece quando todos os objetos com esse prefixo são removidos
     } catch(error) {
         console.error('Erro ao deletar pasta do usuário no R2:', error);
         throw error;
     }
 };
+
+const deletarPastaEvento = async(eventoId) => {
+    try{
+        //Listar todos os objetos na pasta do evento
+        const listParams = {
+            Bucket: process.env.CF_BUCKET_NAME,
+            Prefix: `eventos/${eventoId}`
+        };
+
+        const objects = await s3.send(new ListObjectsV2Command(listParams));
+
+        if(!objects.Contents || objects.Contents.length === 0){
+            return; // Caso a pasta esteja vazia
+        }
+
+        //Preparar array de objetos para deletar
+        const deleteParams = {
+            Bucket: process.env.CF_BUCKET_NAME,
+            Delete:{
+                Objects: objects.Contents.map(obj => ({ Key: obj.key }))
+            }
+        };
+
+        //Deletar todoso os objetos
+        await s3.send(new DeleteObjectsCommand(deleteParams));
+    }catch(error){
+        console.error('Erro ao deletar pasta do evento no R2:', error);
+        throw error;
+    }
+}
 
 module.exports = {
     // Upload de imagem de perfil do usuário
@@ -100,5 +127,6 @@ module.exports = {
         return getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hora de validade
     },
 
-    deletarPastaUsuario
+    deletarPastaUsuario,
+    deletarPastaEvento
 };
