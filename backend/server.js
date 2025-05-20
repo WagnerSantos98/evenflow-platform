@@ -18,7 +18,10 @@ const webhookRoutes = require('./src/routes/webhook.routes'); // Nova rota do we
 const app = express();
 
 //Middlewares
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+}));
 app.use(
     '/api/webhook',
     express.raw({ type: 'application/json' }), // Middleware exclusivo para o webhook da stripe (Precisa ficar antes do express.json)
