@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import {
   AppBar,
@@ -40,8 +40,14 @@ const NavButton = styled(Button)`
 
 const Header = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    setIsAuthenticated(!!token);
+  }, []);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -49,7 +55,7 @@ const Header = () => {
 
   const menuItems = [
     { text: 'Eventos', path: '/eventos' },
-    { text: 'Dashboard', path: '/dashboard' },
+    ...(isAuthenticated ? [{ text: 'Dashboard', path: '/dashboard' }] : []),
     { text: 'Sobre', path: '/sobre' },
     { text: 'Contato', path: '/contato' },
   ];
