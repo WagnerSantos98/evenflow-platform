@@ -1,95 +1,104 @@
-const AWS = require('aws-sdk');
+const { S3Client, PutObjectCommand, ListObjectsV2Command, DeleteObjectsCommand, GetObjectCommand } = require("@aws-sdk/client-s3");
+const { getSignedUrl } = require("@aws-sdk/s3-request-presigner");
 const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
-const s3 = new AWS.S3({
-    region: process.env.AWS_REGION
+// Configuração do cliente R2
+const s3 = new S3Client({
+    region: "auto",
+    endpoint: `https://${process.env.CF_ACCOUNT_ID}.r2.cloudflarestorage.com`,
+    credentials: {
+        accessKeyId: process.env.CF_ACCESS_KEY_ID,
+        secretAccessKey: process.env.CF_SECRET_ACCESS_KEY,
+    },
 });
 
-//Upload da imagem
-const uploadToS3 = async(file, key, acl, metadata = {}) => {
-        const params = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: key,
-            Body: file.data,
-            ACL: acl,
-            ContentType: file.mimetype,
-            Metadata: metadata
-        };
+// Upload da imagem para R2
+const uploadToR2 = async(file, key, acl, metadata = {}) => {
+    const params = {
+        Bucket: process.env.CF_BUCKET_NAME,
+        Key: key,
+        Body: file.data,
+        ACL: acl,
+        ContentType: file.mimetype,
+        Metadata: metadata
+    };
 
-        return s3.upload(params).promise();
+    await s3.send(new PutObjectCommand(params))
+    // Retorna a URL pública da imagem
+    return `https://${process.env.CF_BUCKET_NAME}.r2.cloudflarestorage.com/${key}`;
 };
 
-//Deletar pasta do usário no S3
+// Deletar pasta do usuário no R2
 const deletarPastaUsuario = async(usuarioId) => {
-    try{
-        //Listar todos os objetos na pasta do usuário
+    try {
+        // Listar todos os objetos na pasta do usuário
         const listParams = {
-            Bucket: process.env.AWS_BUCKET_NAME,
+            Bucket: process.env.CF_BUCKET_NAME,
             Prefix: `usuarios/${usuarioId}/`
         };
 
-        const objects = await s3.listObjectsV2(listParams).promise();
+        const objects = await s3.send(new ListObjectsV2Command(listParams));
 
-        if(objects.Contents.length === 0){
-            return; //Caso a pasta esteja vazia
+        if (!objects.Contents || objects.Contents.length === 0) {
+            return; // Caso a pasta esteja vazia
         }
 
-        //preparar array de objetos para deletar
+        // Preparar array de objetos para deletar
         const deleteParams = {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Delete:{
+            Bucket: process.env.CF_BUCKET_NAME,
+            Delete: {
                 Objects: objects.Contents.map(obj => ({ Key: obj.Key }))
             }
         };
 
-        //Deletar todos os objetos
-        await s3.deleteObjects(deleteParams).promise();
+        // Deletar todos os objetos
+        await s3.send(new DeleteObjectsCommand(deleteParams));
 
-        //Deletar a pasta (prefixo)
-        await s3.deleteObject({
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: `usuarios/${usuarioId}/`
-        }).promise();
-    }catch(error){
-        console.error('Erro ao deletar pasta do usuário no S3:', error);
+        // Nota: No R2/S3 não é necessário deletar a "pasta" pois ela é apenas um prefixo
+        // que desaparece quando todos os objetos com esse prefixo são removidos
+    } catch(error) {
+        console.error('Erro ao deletar pasta do usuário no R2:', error);
         throw error;
     }
 };
 
 module.exports = {
-    //Upload de imagem de perfil do usuário
+    // Upload de imagem de perfil do usuário
     uploadAvatarUsuario: async(usuarioId, file) => {
         const extensaoArquivo = file.name.split('.').pop().toLowerCase();
         const nomeArquivo = `avatar.${extensaoArquivo}`
         const key = `usuarios/${usuarioId}/${nomeArquivo}`;
 
-        return uploadToS3(file, key, 'private', {
+        return uploadToR2(file, key, 'private', {
             uploadedBy: usuarioId.toString(),
             originalName: file.name
         });
     },
 
-    //Upload de imagem para evento
-    uploadImagemEvento: async(eventoId, file, isGaleria = false) =>{
-        const extensaoArquivo = file.name.split('.').pop();
+    // Upload de imagem para evento
+    uploadImagemEvento: async(eventoId, file, isGaleria = false) => {
+        const extensaoArquivo = file.name.split('.').pop().toLowerCase();
         const nomeArquivo = uuidv4() + '.' + extensaoArquivo;
         const key = isGaleria
             ? `eventos/${eventoId}/galeria/${nomeArquivo}`
             : `eventos/${eventoId}/capa.${extensaoArquivo}`;
 
-            return uploadToS3(file, key, 'public-read', eventoId);
-    },
-
-    //Gera URL assinada para imagens privadas
-    getUrlAssinada: async(key) => {
-        return s3.getSignedUrl('getObject', {
-            Bucket: process.env.AWS_BUCKET_NAME,
-            Key: key,
-            Expires: 3600 //1 hora de validade
+        return uploadToR2(file, key, 'public-read', {
+            eventoId: eventoId.toString(),
+            originalName: file.name
         });
     },
 
-    deletarPastaUsuario
-}    
+    // Gera URL assinada para imagens privadas
+    getUrlAssinada: async(key) => {
+        const command = new GetObjectCommand({
+            Bucket: process.env.CF_BUCKET_NAME,
+            Key: key
+        });
+        
+        return getSignedUrl(s3, command, { expiresIn: 3600 }); // 1 hora de validade
+    },
 
+    deletarPastaUsuario
+};
