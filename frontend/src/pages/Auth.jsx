@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Paper,
@@ -19,6 +20,7 @@ import {
 } from '@mui/icons-material';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
+import api from '../services/api';
 
 const AuthContainer = styled(Paper)`
   max-width: 500px;
@@ -46,6 +48,7 @@ const Auth = () => {
     senha: '',
     confirmarSenha: '',
   });
+  const navigate = useNavigate();
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -59,10 +62,41 @@ const Auth = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Implementar lógica de autenticação
-    console.log('Form data:', formData);
+
+    try{
+      if(tab === 0){
+        //Login
+        const response = await api.post('/auth/login', {
+          email: formData.email,
+          senha: formData.senha
+        });
+
+        const { token } = response.data;
+        localStorage.setItem('authToken', token);
+        navigate('/dashboard');
+      }else{
+        //Cadastro
+        if(formData.senha !== formData.confirmarSenha){
+          alert('As senhas não coincidem');
+          return;
+        }
+
+        const response = await api.post('/usuarios', {
+          nome: formData.nome,
+          email: formData.email,
+          senha: formData.senha
+        });
+
+        console.log('usuário registrado com sucesso:', response.data);
+        alert('Cadastro realizado com sucesso!');
+        setTab(0); //Retornar a aba de login
+      }
+    }catch(error){
+      console.error('Erro na autenticação:', error);
+      alert('Erro ao autenticar. Verifique os dados.')
+    }
   };
 
   const handleSocialLogin = (provider) => {
