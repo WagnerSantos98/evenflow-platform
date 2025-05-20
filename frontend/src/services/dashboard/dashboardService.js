@@ -36,7 +36,7 @@ const usuarios = {
         const response = await api.get('/usuarios');
         return response.data;
     },
-    criarUsuario: async (usuario) => {
+    /*criarUsuario: async (usuario) => {
         const response = await api.post('/usuario', usuario);
         return response.data;
     },
@@ -47,7 +47,7 @@ const usuarios = {
     excluirUsuario: async (id) => {
         const response = await api.delete(`/usuarios/${id}`);
         return response.data;
-    }
+    }*/
 };
 
 //Método de Relatórios Financeiros - Listagem das vendas (Período, Evento, Categoria e Resumo)

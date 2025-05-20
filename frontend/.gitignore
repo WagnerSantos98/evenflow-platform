@@ -22,3 +22,13 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Ambiente/Variáveis
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env*.backup
+.envrc
+
