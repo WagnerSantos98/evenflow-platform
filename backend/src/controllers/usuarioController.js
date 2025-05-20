@@ -77,8 +77,7 @@ class UsuarioController{
                 mimetype: req.file.mimetype
             };
 
-            const uploadResult = await s3Service.uploadAvatarUsuario(novoUsuario.id, file);
-            foto = uploadResult.Location;
+            foto = await s3Service.uploadAvatarUsuario(novoUsuario.id, file);
 
             //Atualizar usuário com a URL da imagem
             await novoUsuario.update({ foto });
@@ -145,8 +144,8 @@ class UsuarioController{
                     mimetype: req.file.mimetype
                 };
 
-                const uploadResult = await s3Service.uploadAvatarUsuario(usuario.id, file);
-                foto = uploadResult.Location;
+                foto = await s3Service.uploadAvatarUsuario(usuario.id, file);
+                
 
                 //Atualizar usuário com a URL da imagem
                 await usuario.update({ foto });
