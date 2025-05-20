@@ -38,7 +38,7 @@ const validarCadastroUsuario = [
             throw new Error(error.message)
         }
     }),
-    body('dataNascimento').custom((value) => {
+    body('dataNascimento').custom((value, { req }) => {
         try{
             const data = formatarData(value)
             req.body.dataNascimentoISO = data.iso;
@@ -48,9 +48,15 @@ const validarCadastroUsuario = [
         }
     }),
     body('telefone').optional().isMobilePhone('pt-BR').withMessage('Telefone inválido'),
-    body('endereco').optional().isObject().withMessage('Endereço de ser um objeto'),
-    body('endereco.cep').custom((value) => {
+    body('endereco').optional().custom(value => {
+        if (typeof value !== 'object' || Array.isArray(value) || value === null) {
+            throw new Error('Endereço deve ser um objeto');
+        }
+        return true;
+    }),
+    body('endereco.cep').custom((value, { req }) => {
         try{
+            req.body.endereco = req.body.endereco || {};
             req.body.endereco.cepFormatado = formatarCEP(value);
             return true;
         }catch(error){
@@ -67,18 +73,19 @@ const validarCadastroUsuario = [
 
 //Validação de atualização
 const validarAtualizacaoUsuario = [
-    body('nome').trim().notEmpty().withMessage('Nome é obrigatório'),
-    body('email').isEmail().withMessage('Email inválido'),
-    body('senha').isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres'),
-    body('tipoDocumento').isIn(['cpf', 'cnpj']).withMessage('Tipo de documento inválido'),
-    body('documento').custom((value, { req }) => {
+    body('nome').optional().trim().notEmpty().withMessage('Nome é obrigatório'),
+    body('email').optional().isEmail().withMessage('Email inválido'),
+    body('senha').optional().isLength({ min: 6 }).withMessage('Senha deve ter no mínimo 6 caracteres'),
+    body('tipoDocumento').optional().isIn(['cpf', 'cnpj']).withMessage('Tipo de documento inválido'),
+    body('documento').optional().custom((value, { req }) => {
         try{
-            req.body.documentoFormatado = formatarDocumento(value, req.body.tipoDocumento)
+            req.body.documentoFormatado = formatarDocumento(value, req.body.tipoDocumento);
+            return true;
         }catch(error){
             throw new Error(error.message)
         }
     }),
-    body('dataNascimento').custom((value) => {
+    body('dataNascimento').optional().custom((value, { req }) => {
         try{
             const data = formatarData(value)
             req.body.dataNascimentoISO = data.iso;
@@ -88,21 +95,27 @@ const validarAtualizacaoUsuario = [
         }
     }),
     body('telefone').optional().isMobilePhone('pt-BR').withMessage('Telefone inválido'),
-    body('endereco').optional().isObject().withMessage('Endereço deve ser um objeto'),
-    body('endereco.cep').custom((value) => {
+    body('endereco').optional().optional().custom(value => {
+        if (typeof value !== 'object' || Array.isArray(value) || value === null) {
+            throw new Error('Endereço deve ser um objeto');
+        }
+        return true;
+    }),
+    body('endereco.cep').optional().custom((value, { req }) => {
         try{
+            req.body.endereco = req.body.endereco || {};
             req.body.endereco.cepFormatado = formatarCEP(value);
             return true;
         }catch(error){
             throw new Error(error.message);
         }
     }),
-    body('endereco.rua').if(body('endereco').exists()).trim().notEmpty().withMessage('Rua é obrigatória'),
-    body('endereco.bairro').if(body('endereco').exists()).trim().notEmpty().withMessage('Bairro é obrigatório'),
-    body('endereco.numero').if(body('endereco').exists()).trim().notEmpty().withMessage('Número é obrigatório'),
+    body('endereco.rua').optional().trim().notEmpty().withMessage('Rua é obrigatória'),
+    body('endereco.bairro').optional().trim().notEmpty().withMessage('Bairro é obrigatório'),
+    body('endereco.numero').optional().trim().notEmpty().withMessage('Número é obrigatório'),
     body('endereco.complemento').optional().trim(),
-    body('endereco.cidade').if(body('endereco').exists()).trim().notEmpty().withMessage('Cidade é obrigatória'),
-    body('endereco.estado').if(body('endereco').exists()).isLength({ min: 2, max: 2 }).withMessage('Estado deve ter 2 caracteres')
+    body('endereco.cidade').optional().trim().notEmpty().withMessage('Cidade é obrigatória'),
+    body('endereco.estado').optional().isLength({ min: 2, max: 2 }).withMessage('Estado deve ter 2 caracteres')
 ];
 
 //Validação de consulta
