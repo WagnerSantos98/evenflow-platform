@@ -24,9 +24,15 @@ const Evento = sequelize.define('Evento', {
         type: DataTypes.STRING,
         allowNull: true,
     },
-    precoIngresso:{
+    precoIngresso: {
         type: DataTypes.DECIMAL(10, 2),
         allowNull: false,
+        validate: {
+            min: {
+                args: [0],
+                msg: "O preço não pode ser negativo"
+            }
+        }
     },
     ingressosDisponiveis:{
         type: DataTypes.INTEGER,
