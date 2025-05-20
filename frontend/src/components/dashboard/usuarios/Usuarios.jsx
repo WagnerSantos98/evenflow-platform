@@ -88,8 +88,8 @@ const Usuarios = ({ mostrarMensagem }) => {
                                     Email: {usuario.email}
                                 </Typography>
                                 <Chip
-                                    label={usuario.tipo}
-                                    color={usuario.tipo === 'admin' ? 'primary' : 'default'}
+                                    label={usuario.nivelAcesso}
+                                    color={usuario.nivelAcesso === 'admin' ? 'primary' : 'default'}
                                     size="small"
                                 />
                                 <Chip
@@ -133,10 +133,10 @@ const Usuarios = ({ mostrarMensagem }) => {
                     required
                     />
                     <TextField
-                    name="tipo"
-                    label="Tipo"
+                    name="nivelAcesso"
+                    label="Nível de Acesso"
                     select
-                    value={formData.tipo}
+                    value={formData.nivelAcesso}
                     onChange={handleInputChange}
                     fullWidth
                     required
