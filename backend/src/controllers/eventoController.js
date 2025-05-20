@@ -78,8 +78,6 @@ class EventoController {
                 stripePriceId: stripeProduct?.default_price || null
             });
 
-            
-
             //Upload da capa
             const capaFile = request.files?.capa?.[0];
             if (!capaFile || !capaFile.buffer || !capaFile.mimetype.startsWith('image/')) {
@@ -91,6 +89,7 @@ class EventoController {
                 data: capaFile.buffer,
                 mimetype: capaFile.mimetype
             };
+
             const fotoCapa = await s3Service.uploadImagemEvento(novoEvento.id, capaData, false);
             await novoEvento.update({ foto: fotoCapa });
 
@@ -256,8 +255,11 @@ class EventoController {
                 return response.status(403).send({ mensagem: 'Você não tem permissão para realizar esta ação' });
             }
 
+            //Deletar registros da galeria vinculados ao evento
+            await GaleriaEvento.destroy({ where: { eventoId: evento.id }});
+
             //Deletar para do evento no S3
-            await s3Service.deletarEventoPeloId(evento.id);
+            await s3Service.deletarPastaEvento(evento.id);
 
             await evento.destroy();
             response.json({ mensagem: 'O Evento foi deletado com sucesso!' });
