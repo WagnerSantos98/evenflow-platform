@@ -15,8 +15,8 @@ const setupAssociations = () => {
     Local.hasMany(Evento, { as: 'eventos', foreignKey: 'localId', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
 
     //Relacionamento entre Galeria e Evento
-    GaleriaEvento.belongsTo(Evento, { as: 'evento', foreignKey:'eventoId', onDelete: 'SET NULL', onUpdate: 'CASCADE'});
-    Evento.hasMany(GaleriaEvento, { as: 'galeria', foreignKey: 'eventoId', onDelete: 'SET NULL', onUpdate: 'CASCADE'});
+    GaleriaEvento.belongsTo(Evento, { as: 'evento', foreignKey:'eventoId', onDelete: 'CASCADE', onUpdate: 'CASCADE'});
+    Evento.hasMany(GaleriaEvento, { as: 'galeria', foreignKey: 'eventoId', onDelete: 'CASCADE', onUpdate: 'CASCADE'});
 
     //Relacionamento entre Evento e Usuário
     Evento.belongsTo(Usuario, { as: 'organizador', foreignKey: 'organizadorId', onDelete: 'SET NULL', onUpdate: 'CASCADE' });
