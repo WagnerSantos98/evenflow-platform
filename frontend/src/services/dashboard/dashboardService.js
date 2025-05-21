@@ -1,4 +1,5 @@
 import api from '../api';
+import { toFormData } from '../../utils/formDataHelper';
 
 //Módulo de Estatíticas
 const estatisticas = {
@@ -37,9 +38,13 @@ const usuarios = {
         return response.data;
     },
     criarUsuario: async (usuario) => {
-        const response = await api.post('/usuarios', usuario);
-        return response.data;
+        const formData = toFormData(usuario);
+
+        const response = await api.post('/usuarios', formData);
+        return response.data
     },
+
+
     /*atualizarUsuario: async (id, usuario) => {
         const response = await api.put(`/usuarios/${id}`, usuario);
         return response.data;
