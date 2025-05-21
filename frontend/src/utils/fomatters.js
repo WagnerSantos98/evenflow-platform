@@ -4,8 +4,6 @@ export const formatarData = (data) => {
         day: '2-digit',
         month: '2-digit',
         year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
     });
 };
 
@@ -21,3 +19,22 @@ export const formatarMoeda = (valor) => {
 export const formatarPercentual = (valor) => {
     return `${(valor * 100).toFixed(2)}%`
 };
+
+//Formatar documento CPF e CNPJ
+export const formatarDocumento = (value, tipo) => {
+    const numeros = value.replace(/\D/g, '');
+
+    if(tipo === 'CPF'){
+        return numeros.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    }else if(tipo === 'CNPJ'){
+        return numeros.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+    }
+
+    return value;
+};
+
+//Formatar telefone
+export const formatarTelefone = (value) => {
+    const numeros = value.replace(/\D/g, '');
+    return numeros.replace(/(\d{2})(\d{5})(\d{4})/, '($1)$2-$3');
+}
