@@ -1,11 +1,9 @@
 import axios from 'axios';
 
-//Conexão com API - Backend (temporaremente desativado)
+//Conexão com API - 
 const api = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
-    headers:{
-        'Content-Type': 'application/json'
-    }
+    headers: { 'Content-Type': 'multipart/form-data' },
 });
 
 //Interceptor para adicionar o token de autenticação
