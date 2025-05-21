@@ -1,12 +1,35 @@
 import { useState, useEffect } from 'react';
-import dashboardService from '../../services/dashboard/dashboardService'; //Dados mockados
+import { formatarDocumento, formatarTelefone } from '../../utils/fomatters';
+import { generatePassword, buscarCep } from '../../utils/helpers';
+import dashboardService from '../../services/dashboard/dashboardService'; 
 
 //Constantes inciais
 const INITIAL_FORM_DATA = {
     nome: '',
     email: '',
+    senha: '',
+    foto: null,
+    tipoDocumento: '',
+    documento: '',
     nivelAcesso: '',
-    status: ''
+    dataNascimento: null,
+    telefone: '',
+    endereco: {
+        cep: '',
+        rua: '',
+        bairro: '',
+        numero: '',
+        complemento: '',
+        cidade: '',
+        estado: ''
+    },
+};
+
+const INITIAL_CAMPOS_DESABILITADOS = {
+    rua: true,
+    bairro: true,
+    cidade: true,
+    estado: true
 };
 
 const useUsuarios = (mostrarMensagem) => {
@@ -14,12 +37,16 @@ const useUsuarios = (mostrarMensagem) => {
     const [openDialog, setOpenDialog] = useState(false);
     const [selectedUsuario, setSelectedUsuario] = useState(null);
     const [formData, setFormData] = useState(INITIAL_FORM_DATA);
+    const [showPassword, setShowPassword] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState(null);
+    const [camposDesabilitados, setCamposDesabilitados] =  useState(INITIAL_CAMPOS_DESABILITADOS);
 
+    //Carregar usuários ao iniciar
     useEffect(() => {
         carregarUsuarios();
     }, []);
 
-    //Listar usuários
+    //Funções auxiliares
     const carregarUsuarios = async () => {
         try{
             const data = await dashboardService.usuarios.listarUsuarios();
@@ -29,15 +56,85 @@ const useUsuarios = (mostrarMensagem) => {
         }
     };
 
-    //Abrir caixa de diálogo
+    //Manipulação de Formulário
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+
+        if(name === 'documento'){
+            const documentoFormatado = formatarDocumento(value, formData.tipoDocumento);
+            setFormData(prev => ({
+                ...prev,
+                documento: documentoFormatado
+            }));
+        }else if(name === 'telefone'){
+            const telefoneFormatado = formatarTelefone(value);
+            setFormData(prev => ({
+                ...prev,
+                telefone: telefoneFormatado
+            }));
+        }else if(name.startsWith('endereco.')){
+            const enderecoField = name.split('.')[1];
+            setFormData(prev => ({
+                ...prev,
+                endereco: { ...prev.endereco, [enderecoField]: value }
+            }));
+        }else{
+            setFormData(prev => ({
+                ...prev,
+                [name]: value
+            }));
+        }
+    };
+
+    const handleDateChange = (date) => {
+        setFormData(prev => ({
+            ...prev,
+            dataNascimento: date
+        }));
+    };
+
+    const handleFotoChange = (e) => {
+        const file = e.target.files[0];
+        if(file){
+            setFormData(prev => ({
+                ...prev,
+                foto: file
+            }));
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
+    const handleGeneratePassword = () => {
+    const newPassword = generatePassword(); // Agora retorna a senha
+    setFormData(prev => ({
+        ...prev,
+        senha: newPassword
+    }));
+};
+
+    const handleCepChange = async (e) => {
+        const { value } = e.target;
+        const cepFormatado = value.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2');
+    
+        setFormData(prev => ({
+            ...prev,
+            endereco: { ...prev.endereco, cep: cepFormatado },
+        }));
+
+        if (value.replace(/\D/g, '').length === 8) {
+            await buscarCep(value, setFormData, setCamposDesabilitados);
+        }
+    };
+
+    //CRUD de usuários
     const handleOpenDialog = (usuario = null) => {
         if(usuario){
             setSelectedUsuario(usuario);
             setFormData({
-                nome: usuario.nome,
-                email: usuario.email,
-                nivelAcesso: usuario.nivelAcesso,
-                status: usuario.status
+                ...usuario,
+                senha: '',
+                foto: null,
+                endereco: usuario.endereco || INITIAL_FORM_DATA.endereco
             });
         }else{
             setSelectedUsuario(null);
@@ -46,74 +143,97 @@ const useUsuarios = (mostrarMensagem) => {
         setOpenDialog(true);
     };
 
-    //Fechar caixa de diálogo
     const handleCloseDialog = () => {
         setOpenDialog(false);
         setSelectedUsuario(null);
+        setPreviewUrl(null);
         setFormData(INITIAL_FORM_DATA);
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value
-        }));
-    };
+    const handleSubmit = async(e) => {
+        e?.preventDefault();
 
-    //Envio de cadastro e atualização
-    const handleSubmit = async () => {
-        try{ 
+        const camposObrigatorios = ['nome', 'email', 'senha', 'tipoDocumento', 'documento', 'nivelAcesso', 'telefone'];
+        const camposFaltantes = camposObrigatorios.filter(campo => !formData[campo]);
+
+        if(camposFaltantes.length > 0){
+            mostrarMensagem(`Por favor, preencha os campos: ${camposFaltantes.join(', ')}`, 'error');
+            return;
+        }
+
+        const camposEnderecoObrigatorios = ['cep', 'rua', 'bairro', 'numero', 'cidade', 'estado'];
+        const camposEnderecoFaltantes = camposEnderecoObrigatorios.filter(campo => !formData.endereco[campo]);
+
+        if (camposEnderecoFaltantes.length > 0) {
+            mostrarMensagem(`Por favor, preencha os campos do endereço: ${camposEnderecoFaltantes.join(', ')}`, 'error');
+            return;
+        }
+
+        try{
             if(selectedUsuario){
-                await dashboardService.usuarios.listarUsuarios(selectedUsuario.id, formData);
-                mostrarMensagem('Usuário atualizado com sucesso!');
+                await dashboardService.usuarios.atualizarUsuario(selectedUsuario.id, formData);
+                mostrarMensagem('Usuario atualizado com sucesso!', 'success');
             }else{
-                await dashboardService.criarUsuario(formData);
-                mostrarMensagem('Usuário criado com sucesso!');
+                await dashboardService.usuarios.criarUsuario(formData);
+                mostrarMensagem('Usuário cadastrado com sucesso!', 'success');
             }
-            handleCloseDialog();
+            
             carregarUsuarios();
-        }catch(error){ 
-            mostrarMensagem('Erro ao salvar usuário', error);
+            handleCloseDialog();
+        }catch(error){
+            mostrarMensagem('Erro ao salvar usuário', 'error', error);
         }
     };
 
-    //Deletar usuário
-    const handleDeleteUsuario = async (id) => {
+    const handleDeleteUsuario = async(id) => {
         if(window.confirm('Tem certeza que deseja excluir este usuário?')){
             try{
                 await dashboardService.usuarios.excluirUsuario(id);
-                mostrarMensagem('Usuário excluído com sucesso!');
+                mostrarMensagem('Usuário excluído com sucesso!', 'success');
                 carregarUsuarios();
             }catch(error){
-                mostrarMensagem('Erro ao salvar usuário', error);
+                mostrarMensagem('Erro ao excluir usuário', 'error', error);
             }
         }
     };
 
-    const handleToggleStatus = async (id, novoStatus) => {
-    try {
-      await dashboardService.atualizarStatusUsuario(id, novoStatus);
-      mostrarMensagem('Status do usuário atualizado com sucesso!');
-      carregarUsuarios();
-    } catch (error) {
-      mostrarMensagem('Erro ao atualizar status do usuário', error);
-    }
-  };
-
+    const handleToggleStatus = async(id, novoStatus) => {
+        try{
+            await dashboardService.usuarios.atualizarStatusUsuario(id, novoStatus);
+            mostrarMensagem('Status atualizado com sucesso!', 'success');
+            carregarUsuarios();
+        }catch(error){  
+            mostrarMensagem('Erro ao atualizar status', 'error', error)
+        }
+    };
 
     return{
         usuarios,
         openDialog,
         selectedUsuario,
         formData,
+        showPassword,
+        previewUrl,
+        camposDesabilitados,
+        
+        //Manipuladores
+        handleChange,
+        handleDateChange,
+        handleFotoChange,
+        handleGeneratePassword,
+        handleCepChange,
+
+        //Métodos
         handleOpenDialog,
         handleCloseDialog,
-        handleInputChange,
         handleSubmit,
         handleDeleteUsuario,
-        handleToggleStatus
-    }
+        handleToggleStatus,
+        setShowPassword
+    };
 };
+
+
+    
 
 export default useUsuarios;
