@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { formatarDocumento, formatarTelefone } from '../../utils/fomatters';
 import { generatePassword, buscarCep } from '../../utils/helpers';
+import alertService from '../../utils/alertService';
 import dashboardService from '../../services/dashboard/dashboardService'; 
 
 //Constantes inciais
+const ITENS_POR_PAGINA = 5;
+
 const INITIAL_FORM_DATA = {
     nome: '',
     email: '',
@@ -40,19 +43,34 @@ const useUsuarios = (mostrarMensagem) => {
     const [showPassword, setShowPassword] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [camposDesabilitados, setCamposDesabilitados] =  useState(INITIAL_CAMPOS_DESABILITADOS);
+    const [pagina, setPagina] = useState(1);
+    const [totalPaginas, setTotalPaginas] = useState(Math.ceil(usuarios.length / ITENS_POR_PAGINA));
+    const [loading, setLoading] = useState(false);
 
     //Carregar usuários ao iniciar
     useEffect(() => {
         carregarUsuarios();
     }, []);
 
+    useEffect(() => {
+    const total = Math.ceil(usuarios.length / ITENS_POR_PAGINA) || 1;
+    setTotalPaginas(total);
+    if (pagina > total) setPagina(1); // evita erro se a página atual não existir mais
+    }, [usuarios]);
+
+
+
     //Funções auxiliares
     const carregarUsuarios = async () => {
         try{
+            setLoading(true);
             const data = await dashboardService.usuarios.listarUsuarios();
-            setUsuarios(data.usuarios);
+            setUsuarios(data.usuarios); 
+            setPagina(1);
         }catch(error){
             mostrarMensagem('Erro ao carregar usuário', error);
+        }finally {
+        setLoading(false);
         }
     };
 
@@ -126,6 +144,17 @@ const useUsuarios = (mostrarMensagem) => {
         }
     };
 
+    const handlePageChange = (event, newPage) => {
+        if(newPage >= 1 && newPage <= totalPaginas){
+            setPagina(newPage);
+        }
+    }
+
+    const usuariosPaginados = usuarios.slice(
+        (pagina - 1) * ITENS_POR_PAGINA,
+        pagina * ITENS_POR_PAGINA
+    )
+
     //CRUD de usuários
     const handleOpenDialog = (usuario = null) => {
         if(usuario){
@@ -152,6 +181,7 @@ const useUsuarios = (mostrarMensagem) => {
 
     const handleSubmit = async(e) => {
         e?.preventDefault();
+        setLoading(true);
 
         const camposObrigatorios = ['nome', 'email', 'senha', 'tipoDocumento', 'documento', 'nivelAcesso', 'telefone'];
         const camposFaltantes = camposObrigatorios.filter(campo => !formData[campo]);
@@ -175,7 +205,7 @@ const useUsuarios = (mostrarMensagem) => {
                 mostrarMensagem('Usuario atualizado com sucesso!', 'success');
             }else{
                 await dashboardService.usuarios.criarUsuario(formData);
-                mostrarMensagem('Usuário cadastrado com sucesso!', 'success');
+                alertService.usuarios.sucesso('criar');
             }
             
             carregarUsuarios();
@@ -186,15 +216,15 @@ const useUsuarios = (mostrarMensagem) => {
     };
 
     const handleDeleteUsuario = async(id) => {
-        if(window.confirm('Tem certeza que deseja excluir este usuário?')){
-            try{
-                await dashboardService.usuarios.excluirUsuario(id);
-                mostrarMensagem('Usuário excluído com sucesso!', 'success');
-                carregarUsuarios();
-            }catch(error){
-                mostrarMensagem('Erro ao excluir usuário', 'error', error);
+        const result = await alertService.usuarios.confirmar();
+        if(result.isConfirmed){
+                try{
+                    await dashboardService.usuarios.excluirUsuario(id);
+                    carregarUsuarios();
+                }catch(error){
+                    mostrarMensagem('Erro ao excluir usuário', 'error', error);
+                }
             }
-        }
     };
 
     const handleToggleStatus = async(id, novoStatus) => {
@@ -215,6 +245,11 @@ const useUsuarios = (mostrarMensagem) => {
         showPassword,
         previewUrl,
         camposDesabilitados,
+        pagina,
+        totalPaginas,
+        loading,
+        usuariosPaginados,
+
         
         //Manipuladores
         handleChange,
@@ -222,6 +257,7 @@ const useUsuarios = (mostrarMensagem) => {
         handleFotoChange,
         handleGeneratePassword,
         handleCepChange,
+        handlePageChange,
 
         //Métodos
         handleOpenDialog,

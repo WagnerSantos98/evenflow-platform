@@ -48,7 +48,7 @@ const usuarios = {
         }
     },
     criarUsuario: async (usuario) => {
-        const response = await api.post('/usuario', usuario);
+        const response = await api.post('/usuarios', usuario);
         return response.data;
     },
     atualizarUsuario: async (id, usuario) => {

@@ -40,7 +40,11 @@ const usuarios = {
     criarUsuario: async (usuario) => {
         const formData = toFormData(usuario);
 
-        const response = await api.post('/usuarios', formData);
+        const response = await api.post('/usuarios', formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
         return response.data
     },
 
@@ -48,11 +52,11 @@ const usuarios = {
     /*atualizarUsuario: async (id, usuario) => {
         const response = await api.put(`/usuarios/${id}`, usuario);
         return response.data;
-    },
+    },*/
     excluirUsuario: async (id) => {
         const response = await api.delete(`/usuarios/${id}`);
         return response.data;
-    }*/
+    }
 };
 
 //Método de Relatórios Financeiros - Listagem das vendas (Período, Evento, Categoria e Resumo)

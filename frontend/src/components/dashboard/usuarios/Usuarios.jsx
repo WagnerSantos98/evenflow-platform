@@ -3,6 +3,8 @@ import{
     Box, Typography, Grid, Paper, Button, List, ListItem, ListItemText,
     ListItemIcon, IconButton, Dialog, DialogTitle, DialogContent, DialogActions,
     TextField, Divider, Chip, MenuItem, InputAdornment, Avatar, FormControl, InputLabel, Select,
+    CircularProgress,
+    Pagination,
 } from '@mui/material';
 import{ PhotoCamera, Visibility, VisibilityOff, Refresh, Person, Add, Edit, Delete, Block, CheckCircle } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -13,13 +15,17 @@ import styled from 'styled-components';
 
 const Usuarios = ({ mostrarMensagem }) => {
     const{
-        usuarios,
         openDialog,
         selectedUsuario,
         formData,
         showPassword,
         previewUrl,
         camposDesabilitados,
+        pagina,
+        totalPaginas,
+        loading,
+        usuariosPaginados,
+
         
         //Manipuladores
         handleChange,
@@ -27,6 +33,7 @@ const Usuarios = ({ mostrarMensagem }) => {
         handleFotoChange,
         handleGeneratePassword,
         handleCepChange,
+        handlePageChange,
 
         //Métodos
         handleOpenDialog,
@@ -36,6 +43,14 @@ const Usuarios = ({ mostrarMensagem }) => {
         handleToggleStatus,
         setShowPassword
     } = useUsuarios(mostrarMensagem);
+
+    if(loading){
+        return(
+            <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
+                <CircularProgress/>
+            </Box>
+        );
+    }
 
     return(
         <Box>
@@ -55,7 +70,7 @@ const Usuarios = ({ mostrarMensagem }) => {
                 <Grid item xs={12}>
                 <Paper>
                     <List>
-                    {usuarios.map((usuario) => (
+                    {usuariosPaginados.map((usuario) => (
                         <React.Fragment key={usuario.id}>
                         <ListItem
                             secondaryAction={
@@ -125,6 +140,17 @@ const Usuarios = ({ mostrarMensagem }) => {
                     ))}
                     </List>
                 </Paper>
+
+                {totalPaginas > 1 && (
+                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                        <Pagination
+                            count={totalPaginas}
+                            page={pagina}
+                            onChange={handlePageChange}
+                            color="primary"
+                        />
+                    </Box>
+                )}
                 </Grid>
             </Grid>
 
@@ -378,8 +404,8 @@ const Usuarios = ({ mostrarMensagem }) => {
                 </DialogContent>
                 <DialogActions>
                 <Button variant='outlined'  color='inherit' onClick={handleCloseDialog}>Cancelar</Button>
-                <Button onClick={handleSubmit} variant="contained" color="primary">
-                    {selectedUsuario ? 'Atualizar' : 'Salvar'}
+                <Button disabled={loading} onClick={handleSubmit} variant="contained" color="primary">
+                    {loading ? 'Salvando...' : 'Salvar'}
                 </Button>
                 </DialogActions>
             </Dialog>

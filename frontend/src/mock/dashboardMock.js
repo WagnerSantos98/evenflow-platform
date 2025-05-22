@@ -48,7 +48,10 @@ export const mockConfiguracoes = [
     endereco: 'Rua Marcolino Lino de Novaes',
     cnpj: '12.368.187/0001-60',
     taxaServico: '10',
-    
+    notificacoesEmail: true,
+    notificacoesPush: true,
+    manutencao: false,
+    modoTeste: false
   }
 ];
 

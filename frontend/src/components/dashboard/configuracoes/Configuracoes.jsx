@@ -6,7 +6,7 @@ import {
 import { Save } from '@mui/icons-material';
 import useConfiguracoes from '../../../hook/dashboard/useConfiguracoes';
 
-const Configuracoes = (mostrarMensagem) => {
+const Configuracoes = ({mostrarMensagem}) => {
     const{
         configuracoes,
         loading,

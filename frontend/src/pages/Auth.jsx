@@ -40,6 +40,8 @@ const SocialButton = styled(Button)`
 `;
 
 const Auth = () => {
+  const navigate = useNavigate();
+  
   const [tab, setTab] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -48,7 +50,6 @@ const Auth = () => {
     senha: '',
     confirmarSenha: '',
   });
-  const navigate = useNavigate();
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -71,6 +72,10 @@ const Auth = () => {
         const response = await api.post('/auth/login', {
           email: formData.email,
           senha: formData.senha
+        },{
+          headers: {
+            'Content-Type': 'application/json'
+          }
         });
 
         const { token } = response.data;

@@ -24,4 +24,24 @@ export const colors = {
   error: '#FF5252',
   success: '#4CAF50',
   warning: '#FFC107',
+  toast_success: {
+    main: '#071107',
+    icon: '#4CAF50',
+    contrastText: 'rgb(183, 223, 185)'
+  },
+  toast_error: {
+    main: '#180605',
+    icon: '#F44336',
+    contrastText: 'rgb(250, 179, 174)'
+  },
+  toast_warning: {
+    main: '#190F00',
+    icon: '#FF9800',
+    contrastText: 'rgb(255, 213, 153)'
+  },
+  toast_info: {
+    main: '#030E18',
+    icon: '#2176F3',
+    contrastText: 'rgb(166, 213, 250)'
+  }
 };

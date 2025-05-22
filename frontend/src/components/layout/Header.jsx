@@ -45,8 +45,17 @@ const Header = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
 
   useEffect(() => {
-    const token = localStorage.getItem('authToken');
-    setIsAuthenticated(!!token);
+
+    const checkAuth = () => {
+      const token = localStorage.getItem('authToken');
+      setIsAuthenticated(!!token);
+    };
+    
+    checkAuth();
+
+    window.addEventListener('storage', checkAuth);
+
+    return () => window.removeEventListener('storage', checkAuth);
   }, []);
 
   const handleDrawerToggle = () => {
@@ -86,6 +95,7 @@ const Header = () => {
       </ListItem>
     </List>
   );
+  
 
   return (
     <>
