@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Typography, Box } from '@mui/material';
 import { motion } from 'framer-motion';
 import { HeroSection } from '../styles/components/homeStyle';
@@ -6,7 +6,10 @@ import EventSlider from '../components/home/EventSlider';
 import BenefitsSection from '../components/home/BenefitsSection';
 
 const Home = () => {
-
+  useEffect(() => {
+    fetch('https://evenflow-platform.onrender.com')
+      .then(res => res.json())
+  });
   return (
     <motion.div
       initial={{ opacity: 0 }}
