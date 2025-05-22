@@ -15,6 +15,7 @@ import styled from 'styled-components';
 
 const Usuarios = ({ mostrarMensagem }) => {
     const{
+        usuarios,
         openDialog,
         selectedUsuario,
         formData,
@@ -24,7 +25,6 @@ const Usuarios = ({ mostrarMensagem }) => {
         pagina,
         totalPaginas,
         loading,
-        usuariosPaginados,
 
         
         //Manipuladores
@@ -70,7 +70,7 @@ const Usuarios = ({ mostrarMensagem }) => {
                 <Grid item xs={12}>
                 <Paper>
                     <List>
-                    {usuariosPaginados.map((usuario) => (
+                    {usuarios.map((usuario) => (
                         <React.Fragment key={usuario.id}>
                         <ListItem
                             secondaryAction={

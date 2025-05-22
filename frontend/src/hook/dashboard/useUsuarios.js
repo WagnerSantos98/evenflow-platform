@@ -44,29 +44,24 @@ const useUsuarios = (mostrarMensagem) => {
     const [previewUrl, setPreviewUrl] = useState(null);
     const [camposDesabilitados, setCamposDesabilitados] =  useState(INITIAL_CAMPOS_DESABILITADOS);
     const [pagina, setPagina] = useState(1);
-    const [totalPaginas, setTotalPaginas] = useState(Math.ceil(usuarios.length / ITENS_POR_PAGINA));
+    const [totalPaginas, setTotalPaginas] = useState(1);
     const [loading, setLoading] = useState(false);
 
     //Carregar usuários ao iniciar
     useEffect(() => {
-        carregarUsuarios();
-    }, []);
-
-    useEffect(() => {
-    const total = Math.ceil(usuarios.length / ITENS_POR_PAGINA) || 1;
-    setTotalPaginas(total);
-    if (pagina > total) setPagina(1); // evita erro se a página atual não existir mais
-    }, [usuarios]);
+        carregarUsuarios(pagina);
+    }, [pagina]);
 
 
 
     //Funções auxiliares
-    const carregarUsuarios = async () => {
+    const carregarUsuarios = async (paginaAtual = 1) => {
         try{
             setLoading(true);
-            const data = await dashboardService.usuarios.listarUsuarios();
+            const data = await dashboardService.usuarios.listarUsuarios(paginaAtual, ITENS_POR_PAGINA);
             setUsuarios(data.usuarios); 
-            setPagina(1);
+            setTotalPaginas(data.totalPaginas);
+            setPagina(paginaAtual);
         }catch(error){
             mostrarMensagem('Erro ao carregar usuário', error);
         }finally {
@@ -145,15 +140,10 @@ const useUsuarios = (mostrarMensagem) => {
     };
 
     const handlePageChange = (event, newPage) => {
-        if(newPage >= 1 && newPage <= totalPaginas){
+        if (newPage >= 1 && newPage <= totalPaginas) {
             setPagina(newPage);
         }
-    }
-
-    const usuariosPaginados = usuarios.slice(
-        (pagina - 1) * ITENS_POR_PAGINA,
-        pagina * ITENS_POR_PAGINA
-    )
+    };
 
     //CRUD de usuários
     const handleOpenDialog = (usuario = null) => {
@@ -248,7 +238,7 @@ const useUsuarios = (mostrarMensagem) => {
         pagina,
         totalPaginas,
         loading,
-        usuariosPaginados,
+
 
         
         //Manipuladores

@@ -33,8 +33,13 @@ const eventos = {
 
 //Método de Usuários - Listagem, Criação, Edição e Exclusão
 const usuarios = {
-    listarUsuarios: async () => {
-        const response = await api.get('/usuarios');
+    listarUsuarios: async (pagina = 1, limite = 5) => {
+        const response = await api.get('/usuarios', {
+            params: {
+                pagina,
+                limite
+            }
+        });
         return response.data;
     },
     criarUsuario: async (usuario) => {
