@@ -145,6 +145,11 @@ class EventoController {
                 where,
                 include: [
                     {
+                        model: GaleriaEvento,
+                        as: 'galeria',
+                        attributes: ['id', 'urlImagem']
+                    },
+                    {
                         model: Local,
                         as: 'local',
                         attributes: ['id', 'nome', 'endereco']
@@ -168,7 +173,21 @@ class EventoController {
     
     async buscarEventoPorId(request, response){
         try{
-            const evento = await Evento.findByPk(request.params.id);
+            const evento = await Evento.findByPk(request.params.id, {
+                include:[
+                    {
+                        model: GaleriaEvento,
+                        as: 'galeria',
+                        attributes: ['id', 'urlImagem']
+                    },
+                    {
+                        model: Local,
+                        as: 'local',
+                        attributes: ['id', 'nome', 'endereco']
+                    }
+                    
+                ]
+            });
 
             if(!evento){
                 return response.json(404).json({ mensagem: 'Evento não encontrado com esse id!' });
