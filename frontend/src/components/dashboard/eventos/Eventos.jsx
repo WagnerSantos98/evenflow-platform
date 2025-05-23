@@ -2,11 +2,12 @@ import React from 'react';
 import{
     Box, Paper, Typography, Chip, IconButton, Pagination, CircularProgress, Button,
     List, ListItem, ListItemText, ListItemSecondaryAction, Divider, Dialog, DialogTitle,
-    DialogContent, DialogActions, TextField, Grid, MenuItem, Autocomplete
+    DialogContent, DialogActions, TextField, Grid, MenuItem, Autocomplete, FormControl, InputLabel, Select
 } from '@mui/material';
 import{ Edit, Delete, LocationOn, CalendarToday, AttachMoney, People, CloudUpload, Add } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
+import styled from 'styled-components';
 import { formatarData, formatarMoeda } from '../../../utils/fomatters';
 import ptBR from 'date-fns/locale/pt-BR';
 import CustomSnackbar from '../../common/CustomSnackbar';
@@ -16,18 +17,21 @@ import useEventos from '../../../hook/dashboard/useEventos';
 const Eventos = () => {
     const{
         eventos,
+        locais,
         setFormData,
         pagina,
         totalPaginas,
         loading,
         formOpen,
         eventoSelecionado,
+        eventoParaDeletar,
         deleteDialogOpen,
         formData,
         capaPreview,
         galeriaPreviews,
         snackbar,
         hideSnackbar,
+        MESSAGES,
 
         //Manipuladores
         handleImagemCapaChange,
@@ -45,7 +49,7 @@ const Eventos = () => {
         getStatusColor,
         setImagemEditando,
         setFormOpen
-    } = useEventos([]);
+    } = useEventos();
 
 
     if(loading){
@@ -71,7 +75,7 @@ const Eventos = () => {
 
             <Paper>
                 <List>
-                    {eventosPaginados.map((evento) => (
+                    {eventos.map((evento) => (
                         <React.Fragment key={evento.id}>
                             <ListItem>
                                 <ListItemText
@@ -170,7 +174,7 @@ const Eventos = () => {
                                         <Box className="edit-overlay">
                                             <IconButton
                                                 color="primary"
-                                                onClick={() => document.getElementById('imagemCapa').click()}
+                                                onClick={() => document.getElementById('foto').click()}
                                             >
                                                 <Edit />
                                             </IconButton>
@@ -185,7 +189,7 @@ const Eventos = () => {
                                     >
                                         Upload da Imagem de Capa
                                         <input
-                                            id="imagemCapa"
+                                            id="foto"
                                             type="file"
                                             hidden
                                             accept="image/*"
@@ -255,78 +259,79 @@ const Eventos = () => {
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    label="Tipo de Evento"
-                                    value={formData.tipoEvento}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, tipoEvento: e.target.value }))}
-                                    required
+                                <FormControl fullWidth required>
+                                <InputLabel>Tipo de Evento</InputLabel>
+                                <Select
+                                    name="nivelAcesso"
+                                    value={formData.nivelAcesso}
+                                    onChange="{handleChange}"
+                                    label="Nível de Acesso"
                                 >
-                                    {tiposEvento.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                                    <MenuItem value="presencial">Presencial</MenuItem>
+                                    <MenuItem value="online">Online</MenuItem>
+                                </Select>
+                                </FormControl>
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    label="Categoria"
-                                    value={formData.categoria}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, categoria: e.target.value }))}
-                                    required
+                                <FormControl fullWidth required>
+                                <InputLabel>Categoria</InputLabel>
+                                <Select
+                                    name="nivelAcesso"
+                                    value={formData.nivelAcesso}
+                                    onChange="{handleChange}"
+                                    label="Nível de Acesso"
                                 >
-                                    {categorias.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                                    <MenuItem value="comedia">Comédia</MenuItem>
+                                    <MenuItem value="familia">Família</MenuItem>
+                                    <MenuItem value="infantil">Infantil</MenuItem>
+                                    <MenuItem value="musical">Musical</MenuItem>
+                                    <MenuItem value="teatro">Teatro</MenuItem>
+                                    <MenuItem value="esporte">Esporte</MenuItem>
+                                    <MenuItem value="outros">Outros</MenuItem>
+                                </Select>
+                                </FormControl>
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    label="Classificação Etária"
-                                    value={formData.classificacaoEtaria}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, classificacaoEtaria: e.target.value }))}
-                                    required
+                                <FormControl fullWidth required>
+                                <InputLabel>Classificação Etária</InputLabel>
+                                <Select
+                                    name="nivelAcesso"
+                                    value={formData.nivelAcesso}
+                                    onChange="{handleChange}"
+                                    label="Nível de Acesso"
                                 >
-                                    {classificacoesEtarias.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                                    <MenuItem value="L">L</MenuItem>
+                                    <MenuItem value="14">14 anos</MenuItem>
+                                    <MenuItem value="16">16 anos</MenuItem>
+                                    <MenuItem value="18">18 anos</MenuItem>
+                                </Select>
+                                </FormControl>
                             </Grid>
 
                             <Grid item xs={12} sm={6}>
-                                <TextField
-                                    fullWidth
-                                    select
-                                    label="Status"
-                                    value={formData.status}
-                                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
-                                    required
+                                <FormControl fullWidth required>
+                                <InputLabel>Status</InputLabel>
+                                <Select
+                                    name="nivelAcesso"
+                                    value={formData.nivelAcesso}
+                                    onChange="{handleChange}"
+                                    label="Nível de Acesso"
                                 >
-                                    {status.map((option) => (
-                                        <MenuItem key={option.value} value={option.value}>
-                                            {option.label}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
+                                    <MenuItem value="em cartaz">Em Cartaz</MenuItem>
+                                    <MenuItem value="cancelado">Cancelado</MenuItem>
+                                    <MenuItem value="encerrado">Encerrado</MenuItem>
+                                    <MenuItem value="ativo">Ativo</MenuItem>
+                                </Select>
+                                </FormControl>
                             </Grid>
 
                             <Grid item xs={12}>
                                 <Autocomplete
                                     options={locais}
-                                    getOptionLabel={(option) => `${option.nome} - ${option.endereco.cidade}`}
-                                    value={locais.find(local => local.id === formData.localId) || null}
+                                    getOptionLabel={(option) => `${option.nome} - ${option.endereco?.cidade || ''}`}
+                                    value={Array.isArray(locais) ? locais.find(local => local.id === formData.localId) || null : null}
                                     onChange={(_, newValue) => setFormData(prev => ({ ...prev, localId: newValue?.id || '' }))}
                                     renderInput={(params) => (
                                         <TextField
@@ -336,6 +341,7 @@ const Eventos = () => {
                                         />
                                     )}
                                 />
+
                             </Grid>
 
                             {/* Galeria de Imagens */}
@@ -427,7 +433,69 @@ const Eventos = () => {
                 icon="error"
             />
         </Box>
+        
     );
+
 };
+
+const ImagePreview = styled(Box)(({ theme }) => ({
+    width: '100%',
+    height: 200,
+    borderRadius: theme.shape.borderRadius,
+    overflow: 'hidden',
+    position: 'relative',
+    '& img': {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+    },
+    '& .edit-overlay': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0,
+        transition: 'opacity 0.2s',
+        cursor: 'pointer',
+        '&:hover': {
+            opacity: 1
+        }
+    }
+}));
+
+const GalleryImage = styled(Box)(({ theme }) => ({
+    width: 100,
+    height: 100,
+    borderRadius: theme.shape.borderRadius,
+    overflow: 'hidden',
+    position: 'relative',
+    '& img': {
+        width: '100%',
+        height: '100%',
+        objectFit: 'cover'
+    },
+    '& .edit-overlay': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+        bottom: 0,
+        background: 'rgba(0, 0, 0, 0.5)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        opacity: 0,
+        transition: 'opacity 0.2s',
+        cursor: 'pointer',
+        '&:hover': {
+            opacity: 1
+        }
+    }
+}));
 
 export default Eventos;

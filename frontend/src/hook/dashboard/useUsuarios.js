@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { formatarDocumento, formatarTelefone } from '../../utils/fomatters';
 import { generatePassword, buscarCep } from '../../utils/helpers';
-import alertService from '../../utils/alertService';
 import dashboardService from '../../services/dashboard/dashboardService'; 
 
 //Constantes inciais
@@ -195,7 +194,7 @@ const useUsuarios = (mostrarMensagem) => {
                 mostrarMensagem('Usuario atualizado com sucesso!', 'success');
             }else{
                 await dashboardService.usuarios.criarUsuario(formData);
-                alertService.usuarios.sucesso('criar');
+                mostrarMensagem('Usuário cadastrado com sucesso!', 'success');
             }
             
             carregarUsuarios();

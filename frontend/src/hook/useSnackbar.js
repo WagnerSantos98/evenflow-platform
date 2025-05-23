@@ -1,10 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from 'react';
 
 const useSnackbar = () => {
     const [snackbar, setSnackbar] = useState({
-       open: false,
-       message: '',
-       severity: 'success' 
+        open: false,
+        message: '',
+        severity: 'success'
     });
 
     const showSnackbar = useCallback((message, severity = 'success') => {
@@ -28,14 +28,14 @@ const useSnackbar = () => {
     }, [showSnackbar]);
 
     const showWarning = useCallback((message) => {
-        showSnackbar(message, 'warning');   
+        showSnackbar(message, 'warning');
     }, [showSnackbar]);
 
     const showInfo = useCallback((message) => {
         showSnackbar(message, 'info');
     }, [showSnackbar]);
 
-    return{
+    return {
         snackbar,
         showSnackbar,
         hideSnackbar,
@@ -46,4 +46,4 @@ const useSnackbar = () => {
     };
 };
 
-export default useSnackbar;
+export default useSnackbar; 

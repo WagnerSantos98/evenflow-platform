@@ -26,7 +26,7 @@ const uploadToR2 = async(file, key, acl, metadata = {}) => {
 
     await s3.send(new PutObjectCommand(params))
     // Retorna a URL pública da imagem
-    return `https://${process.env.CF_BUCKET_NAME}.r2.cloudflarestorage.com/${key}`;
+    return `${process.env.CF_PUBLIC_BASE_URL}/${key}`;
 };
 
 // Deletar pasta do usuário no R2

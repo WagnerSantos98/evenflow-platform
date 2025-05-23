@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import useSnackbar from '../useSnackbar';
+import useSnackbar  from '../useSnackbar';
 import { MESSAGES } from '../../utils/alerts/messages';
 import dashboardService from '../../services/dashboard/dashboardService'; 
 
@@ -17,12 +17,13 @@ const INITIAL_FORM_DATA = {
     classificacaoEtaria: '',
     status: '',
     localId: '',
-    capa: '',
+    foto: null,
     galeria: []
 };
 
-const useEventos = (mostrarMensagem) => {
+const useEventos = () => {
     const [eventos, setEventos] = useState([]);
+    const [locais, setLocais] = useState([]);
     const [pagina, setPagina] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -34,28 +35,36 @@ const useEventos = (mostrarMensagem) => {
     const [capaPreview, setCapaPreview] = useState('');
     const [galeriaPreviews, setGaleriaPreviews] = useState([]);
     const [imagemEditando, setImagemEditando] = useState(null);
-    const [snackbar, showSuccess, showError, hideSnackbar] = useSnackbar();
+    const { snackbar, showSuccess, showError, hideSnackbar } = useSnackbar();
+
 
     //Carregar usuários ao iniciar
     useEffect(() => {
-        carregarEventos(pagina);
-    }, [pagina]);
+        carregarDadosIniciais();
+    }, []);
 
     //Funções auxiliares
-    const carregarEventos = async (paginaAtual = 1) => {
+    const carregarDadosIniciais = async (paginaAtual = 1) => {
         try{
             setLoading(true);
-            const data = await dashboardService.eventos.listarEventosAll(paginaAtual, ITEMS_POR_PAGINA);
-            setEventos(data.eventos);
-            setTotalPaginas(data.totalPaginas);
+            
+            const [eventosResponse, locaisResponse] = await Promise.all([
+                dashboardService.eventos.listarEventosAll(paginaAtual, ITEMS_POR_PAGINA),
+                dashboardService.locais.listarLocais()
+            ]);
+            setEventos(eventosResponse.eventos);
+            setTotalPaginas(eventosResponse.totalPaginas);
             setPagina(paginaAtual);
+
+            setLocais(locaisResponse)
         }catch(error){
-            mostrarMensagem('Erro ao carregar usuário', error);
+            showError(MESSAGES.EVENTO.ERRO_LISTAR, error);
+            showError(MESSAGES.LOCAL.ERRO_LISTAR, error);
         }finally{
             setLoading(false);
         }
     };
-
+    
     //Manipulação de Formulário
     const handleImagemCapaChange = (event) => {
         const file = event.target.files[0];
@@ -65,7 +74,7 @@ const useEventos = (mostrarMensagem) => {
                 setCapaPreview(reader.result);
                 setFormData(prev => ({
                     ...prev,
-                    imagemCapa: reader.result
+                    foto: reader.result
                 }));
             };
             reader.readAsDataURL(file);
@@ -152,7 +161,7 @@ const useEventos = (mostrarMensagem) => {
             ...evento,
             data: new Date(evento.data)
         });
-        setCapaPreview(evento.capa || '');
+        setCapaPreview(evento.foto || '');
         setGaleriaPreviews(evento.galeria || []);
         setFormOpen(true);
     };
@@ -187,11 +196,13 @@ const useEventos = (mostrarMensagem) => {
 
     return{
         eventos,
+        locais,
         pagina,
         totalPaginas,
         loading,
         formOpen,
         eventoSelecionado,
+        eventoParaDeletar,
         deleteDialogOpen,
         formData,
         capaPreview,
@@ -199,6 +210,7 @@ const useEventos = (mostrarMensagem) => {
         imagemEditando,
         snackbar,
         hideSnackbar,
+        MESSAGES,
 
         //Manipuladores
         handleImagemCapaChange,

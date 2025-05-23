@@ -23,6 +23,10 @@ const eventos = {
         });
         return response.data;
     },
+    buscarPorId: async (id) => {
+        const response = await api.get(`/eventos/${id}`);
+        return response.data;
+    },
     criarEvento: async (evento) => {
         const response = await api.post('/eventos', evento);
         return response.data;
@@ -66,6 +70,13 @@ const usuarios = {
     },*/
     excluirUsuario: async (id) => {
         const response = await api.delete(`/usuarios/${id}`);
+        return response.data;
+    }
+};
+
+const locais = {
+    listarLocais: async () => {
+        const response = await api.get('/locais');
         return response.data;
     }
 };
@@ -126,6 +137,7 @@ const dashboardService = {
     estatisticas,
     eventos,
     usuarios,
+    locais,
     relatoriosFinanceiros,
     periodos,
     configuracoes

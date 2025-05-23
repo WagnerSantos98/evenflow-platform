@@ -9,7 +9,7 @@ import {
   Snackbar,
   Alert,
 } from '@mui/material';
-//import Eventos from '../components/dashboard/eventos/Eventos';
+import Eventos from '../components/dashboard/eventos/Eventos';
 import Usuarios from '../components/dashboard/usuarios/Usuarios';
 import Relatorios from '../components/dashboard/relatorios/Relatorios';
 import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
@@ -45,8 +45,8 @@ const Dashboard = () => {
 
   const renderTabContent = () => {
     switch (selectedTab) {
-      /*case 0:
-        return <Eventos mostrarMensagem={mostrarMensagem} />;*/
+      case 0:
+        return <Eventos mostrarMensagem={mostrarMensagem} />;
       case 1:
         return <Usuarios mostrarMensagem={mostrarMensagem} />;
       case 2:
