@@ -17,6 +17,12 @@ const eventos = {
         });
         return response.data;
     },
+    listarEventosAll: async (pagina = 1, limite = 5) => {
+        const response = await api.get('/eventos', {
+            params: { pagina, limite}
+        });
+        return response.data;
+    },
     criarEvento: async (evento) => {
         const response = await api.post('/eventos', evento);
         return response.data;

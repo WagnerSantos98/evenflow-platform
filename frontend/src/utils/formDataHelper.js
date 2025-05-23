@@ -17,6 +17,7 @@ export function toFormData(data){
     formData.append('foto', data.foto);
   }
 
+
   if (data.tipoDocumento) {
     formData.append('tipoDocumento', data.tipoDocumento.toLowerCase());
   }
@@ -25,6 +26,15 @@ export function toFormData(data){
     if (!['foto', 'endereco', 'dataNascimento', 'tipoDocumento'].includes(key) &&
         data[key] !== null && data[key] !== undefined) {
       formData.append(key, data[key]);
+    }
+
+    //Eventos
+    if(data.capa){
+      formData.append('capa', data.capa);
+    }
+
+    if(data.galeria){
+      formData.append('galeria', data.galeria);
     }
   });
 

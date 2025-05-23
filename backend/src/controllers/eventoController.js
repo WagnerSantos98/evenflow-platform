@@ -175,11 +175,7 @@ class EventoController {
         try{
             const evento = await Evento.findByPk(request.params.id, {
                 include:[
-                    {
-                        model: GaleriaEvento,
-                        as: 'galeria',
-                        attributes: ['id', 'urlImagem']
-                    },
+                    
                     {
                         model: Local,
                         as: 'local',

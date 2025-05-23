@@ -1,4 +1,6 @@
 import { useState, useEffect } from 'react';
+import useSnackbar from '../useSnackbar';
+import { MESSAGES } from '../../utils/alerts/messages';
 import dashboardService from '../../services/dashboard/dashboardService'; 
 
 //Constantes inciais
@@ -22,7 +24,7 @@ const INITIAL_FORM_DATA = {
 const useEventos = (mostrarMensagem) => {
     const [eventos, setEventos] = useState([]);
     const [pagina, setPagina] = useState(1);
-    const [totalPaginas, setTotalPaginas] = useState(Math.ceil(eventos.length / ITEMS_POR_PAGINA));
+    const [totalPaginas, setTotalPaginas] = useState(1);
     const [loading, setLoading] = useState(false);
     const [formOpen, setFormOpen] = useState(false);
     const [eventoSelecionado, setEventoSelecionado] = useState(null);
@@ -32,19 +34,25 @@ const useEventos = (mostrarMensagem) => {
     const [capaPreview, setCapaPreview] = useState('');
     const [galeriaPreviews, setGaleriaPreviews] = useState([]);
     const [imagemEditando, setImagemEditando] = useState(null);
+    const [snackbar, showSuccess, showError, hideSnackbar] = useSnackbar();
 
     //Carregar usuários ao iniciar
     useEffect(() => {
-        carregarEventos();
-    }, []);
+        carregarEventos(pagina);
+    }, [pagina]);
 
     //Funções auxiliares
-    const carregarEventos = async () => {
+    const carregarEventos = async (paginaAtual = 1) => {
         try{
-            const data = await dashboardService.eventos.listarEventosAll();
+            setLoading(true);
+            const data = await dashboardService.eventos.listarEventosAll(paginaAtual, ITEMS_POR_PAGINA);
             setEventos(data.eventos);
+            setTotalPaginas(data.totalPaginas);
+            setPagina(paginaAtual);
         }catch(error){
             mostrarMensagem('Erro ao carregar usuário', error);
+        }finally{
+            setLoading(false);
         }
     };
 
@@ -87,7 +95,7 @@ const useEventos = (mostrarMensagem) => {
         });
     };
 
-    const handleRemoveImagemGaleria = (index) => {
+    const handleRemoverImagemGaleria = (index) => {
         const newPreviews = galeriaPreviews.filter((_, i) => i !== index);
         setGaleriaPreviews(newPreviews);
         setFormData(prev => ({
@@ -97,8 +105,10 @@ const useEventos = (mostrarMensagem) => {
     };
 
     const handlePageChange = (event, newPage) => {
-        setPagina(newPage);
-    }
+        if(newPage >= 1 && newPage <= totalPaginas){
+            setPagina(newPage);
+        }
+    };
     
     //CRUD de eventos
     const handleNovoEvento = () => {
@@ -118,7 +128,7 @@ const useEventos = (mostrarMensagem) => {
                 setEventos(prev => prev.map(evento => 
                     evento.id === eventoSelecionado.id ? { ...formData, id: evento.id } : evento
                 ));
-                mostrarMensagem('Evento atualizado com sucesso!', 'success');
+                showSuccess(MESSAGES.EVENTO.ATUALIZADO);
             }else{
                 const novoEvento = {
                     ...formData,
@@ -126,11 +136,11 @@ const useEventos = (mostrarMensagem) => {
                 };
                 setEventos(prev => [...prev, novoEvento]);
                 setTotalPaginas(Math.ceil((eventos.length + 1) - ITEMS_POR_PAGINA));
-                mostrarMensagem('Evento criado com sucesso!', 'success');
+                showSuccess(MESSAGES.EVENTO.CRIADO);
             }
             setFormOpen(false);
         }catch(error){
-            mostrarMensagem('Erro ao salvar evento', 'error', error);
+            showError(MESSAGES.EVENTO.ERRO_SALVAR, error);
         }finally{
             setLoading(true);
         }
@@ -155,9 +165,24 @@ const useEventos = (mostrarMensagem) => {
     const handleConfirmDelete = () => {
         setEventos(prev => prev.filter(evento => evento.id !== eventoParaDeletar.id));
         setTotalPaginas(Math.ceil((eventos.length - 1) / ITEMS_POR_PAGINA));
-        mostrarMensagem('Evento excluído com sucesso!', 'success');
+        showSuccess(MESSAGES.EVENTO.EXCLUIDO);
         setDeleteDialogOpen(false);
         setEventoParaDeletar(null);
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteDialogOpen(false);
+        setEventoParaDeletar(null);
+    };
+
+    const getStatusColor = (status) => {
+        const cores = {
+            'em cartaz': 'success',
+            'cancelado': 'error',
+            'encerrado': 'default',
+            'agendado': 'info'
+        };
+        return cores[status] || 'default';
     }
 
     return{
@@ -172,11 +197,13 @@ const useEventos = (mostrarMensagem) => {
         capaPreview,
         galeriaPreviews,
         imagemEditando,
+        snackbar,
+        hideSnackbar,
 
         //Manipuladores
         handleImagemCapaChange,
         handleGaleriaChange,
-        handleRemoveImagemGaleria,
+        handleRemoverImagemGaleria,
         handlePageChange,
 
         //Métodos
@@ -184,7 +211,11 @@ const useEventos = (mostrarMensagem) => {
         handleSubmit,
         handleEditarEvento,
         handleDeleteClick,
-        handleConfirmDelete
+        handleConfirmDelete,
+        handleCancelDelete,
+        getStatusColor,
+        setImagemEditando,
+        setFormOpen
 
     }
 };
