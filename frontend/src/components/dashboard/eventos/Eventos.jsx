@@ -262,8 +262,8 @@ const Eventos = () => {
                                 <FormControl fullWidth required>
                                 <InputLabel>Tipo de Evento</InputLabel>
                                 <Select
-                                    name="nivelAcesso"
-                                    value={formData.nivelAcesso}
+                                    name="tipoEvento"
+                                    value={formData.tipoEvento}
                                     onChange="{handleChange}"
                                     label="Nível de Acesso"
                                 >
@@ -277,8 +277,8 @@ const Eventos = () => {
                                 <FormControl fullWidth required>
                                 <InputLabel>Categoria</InputLabel>
                                 <Select
-                                    name="nivelAcesso"
-                                    value={formData.nivelAcesso}
+                                    name="categoria"
+                                    value={formData.categoria}
                                     onChange="{handleChange}"
                                     label="Nível de Acesso"
                                 >
@@ -297,8 +297,8 @@ const Eventos = () => {
                                 <FormControl fullWidth required>
                                 <InputLabel>Classificação Etária</InputLabel>
                                 <Select
-                                    name="nivelAcesso"
-                                    value={formData.nivelAcesso}
+                                    name="classificacaoEtaria"
+                                    value={formData.classificacaoEtaria}
                                     onChange="{handleChange}"
                                     label="Nível de Acesso"
                                 >
@@ -314,8 +314,8 @@ const Eventos = () => {
                                 <FormControl fullWidth required>
                                 <InputLabel>Status</InputLabel>
                                 <Select
-                                    name="nivelAcesso"
-                                    value={formData.nivelAcesso}
+                                    name="status"
+                                    value={formData.status}
                                     onChange="{handleChange}"
                                     label="Nível de Acesso"
                                 >
@@ -353,7 +353,7 @@ const Eventos = () => {
                                     {galeriaPreviews && galeriaPreviews.length > 0 ? (
                                         galeriaPreviews.map((preview, index) => (
                                             <GalleryImage key={index}>
-                                                <img src={preview} alt={`Imagem ${index + 1}`} />
+                                                <img src={preview.urlImagem} alt={`Imagem ${index + 1}`} />
                                                 <Box className="edit-overlay">
                                                     <IconButton
                                                         color="primary"

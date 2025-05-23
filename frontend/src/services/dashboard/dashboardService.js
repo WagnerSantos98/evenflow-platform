@@ -23,10 +23,6 @@ const eventos = {
         });
         return response.data;
     },
-    buscarPorId: async (id) => {
-        const response = await api.get(`/eventos/${id}`);
-        return response.data;
-    },
     criarEvento: async (evento) => {
         const response = await api.post('/eventos', evento);
         return response.data;
