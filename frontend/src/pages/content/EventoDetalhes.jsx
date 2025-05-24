@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import {
   Typography,
   Box,
@@ -166,9 +167,14 @@ const EventoDetalhes = () => {
               </Typography>
             </Box>
 
-            <Button variant="contained" color="primary" size="large" fullWidth sx={{ mb: 2 }}>
-              Comprar Ingresso
-            </Button>
+            <Link 
+              to={`/comprar-ingresso/${evento.id}`}
+              >
+               <Button variant="contained" 
+              color="primary" 
+              size="large" 
+              fullWidth sx={{ mb: 2 }}>Comprar Ingresso</Button>
+            </Link>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
               <IconButton color="primary">

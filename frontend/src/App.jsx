@@ -15,6 +15,7 @@ import Dashboard from './pages/Dashboard';
 
 //Páginas Content
 import EventoDetalhes from './pages/content/EventoDetalhes';
+import ComprarIngresso from './pages/content/ComprarIngresso';
 import FAQ from './pages/content/FAQ';
 import TermosPoliticas from './pages/content/TermosPolitica';
 import CentralAjuda from './pages/content/CentralAjuda';
@@ -23,6 +24,7 @@ import Suporte from './pages/content/Suporte';
 import Blog from './pages/content/Blog';
 import SejaParceiro from './pages/content/SejaParceiro';
 import Chat from './pages/content/Chat';
+
 
 function App() {
   return (
@@ -36,6 +38,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/eventos" element={<Eventos />} />
               <Route path="/eventos/:id" element={<EventoDetalhes />} />
+              <Route path="/comprar-ingresso/:id" element={<ComprarIngresso/>}/>
               <Route path="/sobre" element={<Sobre />} />
               <Route path="/contato" element={<Contato />} />
               <Route path="/auth" element={<Auth />} />
