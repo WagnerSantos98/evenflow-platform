@@ -11,17 +11,13 @@ const estatisticas = {
 
 //Método de Eventos - Listagem, Criação, Edição e Exclusão
 const eventos = {
-    listarEventos: async (periodo, dataInicio, dataFim) => {
-        const response = await api.get('/eventos/recentes', {
-            params: { periodo, dataInicio, dataFim}
-        });
+    listarEventos: async (params = {}) => {
+        const response = await api.get('/eventos', { params });
         return response.data;
     },
-    listarEventosAll: async (pagina = 1, limite = 5) => {
-        const response = await api.get('/eventos', {
-            params: { pagina, limite}
-        });
-        return response.data;
+    buscarEventoId: async (id) => {
+      const response = await api.get(`/eventos/${id}`);
+      return response.data; 
     },
     criarEvento: async (evento) => {
         const response = await api.post('/eventos', evento);
@@ -73,7 +69,7 @@ const usuarios = {
 const locais = {
     listarLocais: async () => {
         const response = await api.get('/locais');
-        return response.data;
+        return response.data.locais;
     }
 };
 

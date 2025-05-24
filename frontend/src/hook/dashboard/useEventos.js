@@ -40,22 +40,26 @@ const useEventos = () => {
 
     //Carregar usuários ao iniciar
     useEffect(() => {
-        carregarDadosIniciais();
+        carregarDados();
     }, []);
 
     //Funções auxiliares
-    const carregarDadosIniciais = async (paginaAtual = 1) => {
+    const carregarDados = async (paginaAtual = 1) => {
         try{
             setLoading(true);
             
+            const params = {
+                pagina,
+                itensPorPagina: ITEMS_POR_PAGINA,
+            }
+
             const [eventosResponse, locaisResponse] = await Promise.all([
-                dashboardService.eventos.listarEventosAll(paginaAtual, ITEMS_POR_PAGINA),
+                dashboardService.eventos.listarEventos(params),
                 dashboardService.locais.listarLocais()
             ]);
             setEventos(eventosResponse.eventos);
             setTotalPaginas(eventosResponse.totalPaginas);
             setPagina(paginaAtual);
-
             setLocais(locaisResponse)
         }catch(error){
             showError(MESSAGES.EVENTO.ERRO_LISTAR, error);
