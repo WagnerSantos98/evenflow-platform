@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getToken, clearToken } from '../utils/authToken';
 
 //Conexão com API - 
 const api = axios.create({
@@ -7,7 +8,7 @@ const api = axios.create({
 
 //Interceptor para adicionar o token de autenticação
 api.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token');
+    const token = getToken();
     if(token){
         config.headers.Authorization = `Bearer ${token}`; 
     }
@@ -25,7 +26,7 @@ api.interceptors.response.use(
             switch(status){
                 case 401:
                     //Token expirado ou inválido
-                    localStorage.removeItem('token');
+                    clearToken();
                     window.location.href = '/login';
                     break;
                 case 403:

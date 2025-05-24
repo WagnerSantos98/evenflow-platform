@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
+import useSnackbar from '../useSnackbar';
 import { formatarDocumento, formatarTelefone } from '../../utils/fomatters';
 import { generatePassword, buscarCep } from '../../utils/helpers';
+import { MESSAGES } from '../../utils/alerts/messages';
 import dashboardService from '../../services/dashboard/dashboardService'; 
+
 
 //Constantes inciais
 const ITENS_POR_PAGINA = 5;
@@ -42,9 +45,12 @@ const useUsuarios = (mostrarMensagem) => {
     const [showPassword, setShowPassword] = useState(false);
     const [previewUrl, setPreviewUrl] = useState(null);
     const [camposDesabilitados, setCamposDesabilitados] =  useState(INITIAL_CAMPOS_DESABILITADOS);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [usuarioParaDeletar, setUsuarioParaDeletar] = useState(null);
     const [pagina, setPagina] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
     const [loading, setLoading] = useState(false);
+    const { snackbar, showSuccess, showError, hideSnackbar } = useSnackbar();
 
     //Carregar usuários ao iniciar
     useEffect(() => {
@@ -58,11 +64,16 @@ const useUsuarios = (mostrarMensagem) => {
         try{
             setLoading(true);
             const data = await dashboardService.usuarios.listarUsuarios(paginaAtual, ITENS_POR_PAGINA);
+
+            if(data.usuarios.length === 0 && paginaAtual > 1){
+                return carregarUsuarios(paginaAtual - 1);
+            }
+
             setUsuarios(data.usuarios); 
-            setTotalPaginas(data.totalPaginas);
+            setTotalPaginas(data.totalPaginas || Math.ceil(data.total / ITENS_POR_PAGINA));
             setPagina(paginaAtual);
         }catch(error){
-            mostrarMensagem('Erro ao carregar usuário', error);
+            showError(MESSAGES.USUARIO.ERRO_LISTAR, error);
         }finally {
         setLoading(false);
         }
@@ -191,30 +202,44 @@ const useUsuarios = (mostrarMensagem) => {
         try{
             if(selectedUsuario){
                 await dashboardService.usuarios.atualizarUsuario(selectedUsuario.id, formData);
-                mostrarMensagem('Usuario atualizado com sucesso!', 'success');
+                showSuccess(MESSAGES.USUARIO.ATUALIZADO);
             }else{
                 await dashboardService.usuarios.criarUsuario(formData);
-                mostrarMensagem('Usuário cadastrado com sucesso!', 'success');
+                showSuccess(MESSAGES.USUARIO.CRIADO);
             }
             
             carregarUsuarios();
             handleCloseDialog();
         }catch(error){
-            mostrarMensagem('Erro ao salvar usuário', 'error', error);
+            showError(MESSAGES.USUARIO.ERRO_SALVAR, error);
         }
     };
 
-    const handleDeleteUsuario = async(id) => {
-        const result = await alertService.usuarios.confirmar();
-        if(result.isConfirmed){
-                try{
-                    await dashboardService.usuarios.excluirUsuario(id);
-                    carregarUsuarios();
-                }catch(error){
-                    mostrarMensagem('Erro ao excluir usuário', 'error', error);
-                }
-            }
+    const handleDeleteClick = (usuario) => {
+        setUsuarioParaDeletar(usuario);
+        setDeleteDialogOpen(true);
     };
+
+    const handleConfirmDelete = async () => {
+        try{
+            await dashboardService.usuarios.excluirUsuario(usuarioParaDeletar.id);
+
+            await carregarUsuarios(pagina);
+
+            showSuccess(MESSAGES.USUARIO.EXCLUIDO);
+            setDeleteDialogOpen(false);
+            setUsuarioParaDeletar(null);
+        }catch(error){
+            showError(MESSAGES.USUARIO.ERRO_EXCLUIR, error);
+        }
+        
+    };
+
+    const handleCancelDelete = () => {
+        setDeleteDialogOpen(false);
+        setUsuarioParaDeletar(null);
+    };
+
 
     const handleToggleStatus = async(id, novoStatus) => {
         try{
@@ -226,6 +251,8 @@ const useUsuarios = (mostrarMensagem) => {
         }
     };
 
+
+
     return{
         usuarios,
         openDialog,
@@ -234,9 +261,14 @@ const useUsuarios = (mostrarMensagem) => {
         showPassword,
         previewUrl,
         camposDesabilitados,
+        usuarioParaDeletar,
+        deleteDialogOpen,
         pagina,
         totalPaginas,
         loading,
+        snackbar,
+        hideSnackbar,
+        MESSAGES,
 
 
         
@@ -252,7 +284,9 @@ const useUsuarios = (mostrarMensagem) => {
         handleOpenDialog,
         handleCloseDialog,
         handleSubmit,
-        handleDeleteUsuario,
+        handleDeleteClick,
+        handleConfirmDelete,
+        handleCancelDelete,
         handleToggleStatus,
         setShowPassword
     };

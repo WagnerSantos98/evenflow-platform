@@ -13,7 +13,7 @@ export function toFormData(data){
     });
   }
 
-  if (data.foto) {
+  if (data.foto && data.foto instanceof File) {
     formData.append('foto', data.foto);
   }
 
@@ -29,13 +29,13 @@ export function toFormData(data){
     }
 
     //Eventos
-    if(data.capa){
+    /*if(data.capa){
       formData.append('capa', data.capa);
     }
 
     if(data.galeria){
       formData.append('galeria', data.galeria);
-    }
+    }*/
   });
 
   return formData;

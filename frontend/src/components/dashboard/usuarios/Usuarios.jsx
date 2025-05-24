@@ -10,14 +10,18 @@ import{ PhotoCamera, Visibility, VisibilityOff, Refresh, Person, Add, Edit, Dele
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import ptBR from 'date-fns/locale/pt-BR';
+import CustomSnackbar from '../../common/CustomSnackbar';
+import ConfirmDialog from '../../common/ConfirmDialog';
 import useUsuarios from '../../../hook/dashboard/useUsuarios';
 import styled from 'styled-components';
 
-const Usuarios = ({ mostrarMensagem }) => {
+const Usuarios = () => {
     const{
         usuarios,
         openDialog,
         selectedUsuario,
+        usuarioParaDeletar,
+        deleteDialogOpen,
         formData,
         showPassword,
         previewUrl,
@@ -25,6 +29,9 @@ const Usuarios = ({ mostrarMensagem }) => {
         pagina,
         totalPaginas,
         loading,
+        snackbar,
+        hideSnackbar,
+        MESSAGES,
 
         
         //Manipuladores
@@ -39,10 +46,12 @@ const Usuarios = ({ mostrarMensagem }) => {
         handleOpenDialog,
         handleCloseDialog,
         handleSubmit,
-        handleDeleteUsuario,
+        handleDeleteClick,
+        handleConfirmDelete,
+        handleCancelDelete,
         handleToggleStatus,
         setShowPassword
-    } = useUsuarios(mostrarMensagem);
+    } = useUsuarios();
 
     if(loading){
         return(
@@ -101,7 +110,7 @@ const Usuarios = ({ mostrarMensagem }) => {
                                 <IconButton
                                 edge="end"
                                 aria-label="delete"
-                                onClick={() => handleDeleteUsuario(usuario.id)}
+                                onClick={() => handleDeleteClick(usuario)}
                                 >
                                 <Delete />
                                 </IconButton>
@@ -165,7 +174,7 @@ const Usuarios = ({ mostrarMensagem }) => {
                         <Grid item xs={12} sx={{ textAlign: 'center' }}>
                             <Box sx={{ position: 'relative', display: 'inline-block' }}>
                             <Avatar
-                                src={previewUrl || (selectedUsuario?.fotoUrl) || ''}
+                                src={previewUrl || (selectedUsuario?.foto) || ''}
                                 sx={{ width: 100, height: 100, mb: 2 }}
                             />
                             <IconButton
@@ -409,6 +418,25 @@ const Usuarios = ({ mostrarMensagem }) => {
                 </Button>
                 </DialogActions>
             </Dialog>
+
+            <CustomSnackbar
+                open={snackbar.open}
+                message={snackbar.message}
+                severity={snackbar.severity}
+                onClose={hideSnackbar}
+            />
+
+            <ConfirmDialog
+                open={deleteDialogOpen}
+                title={MESSAGES.USUARIO.TITULO_EXCLUSAO}
+                message={MESSAGES.USUARIO.CONFIRMAR_EXCLUSAO.replace('{nome}', usuarioParaDeletar?.nome)}
+                onConfirm={handleConfirmDelete}
+                onCancel={handleCancelDelete}
+                confirmText={MESSAGES.USUARIO.BOTAO_EXCLUIR}
+                cancelText={MESSAGES.USUARIO.BOTAO_CANCELAR}
+                confirmColor="error"
+                icon="error"
+            />
         </Box>
   );
 };

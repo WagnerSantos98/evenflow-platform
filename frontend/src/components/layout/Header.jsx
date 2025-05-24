@@ -14,6 +14,7 @@ import {
   useTheme,
 } from '@mui/material';
 import { Menu as MenuIcon } from '@mui/icons-material';
+import { getToken } from '../../utils/authToken';
 import styled from 'styled-components';
 
 const StyledAppBar = styled(AppBar)`
@@ -47,7 +48,7 @@ const Header = () => {
   useEffect(() => {
 
     const checkAuth = () => {
-      const token = localStorage.getItem('authToken');
+      const token = getToken();
       setIsAuthenticated(!!token);
     };
     
