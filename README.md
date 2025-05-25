@@ -7,8 +7,8 @@
 - [Tecnologias](#tecnologias)
 - [Estrutura](#estrutura-do-repositório)
 - [Documentação](#documentação-do-backend---api)
-- [Deploy](#deploy-e-hospedagem)
-- [Execução](#como-executar-o-projeto-manualmente)
+- [Deploy - Projeto Hospedado](#deploy-e-hospedagem)
+- [Execução Manual](#como-executar-o-projeto-manualmente)
 - [Contribuições](#autores)
 
 ## Funcionalidades
