@@ -2,6 +2,15 @@
 
 **EvenFlow** é uma plataforma de gerenciamento de eventos que visa facilitar a criação, organização e acompanhamento de eventos de maneira eficiente e acessível. Este repositório contém tanto o código do back-end quanto do front-end para o desenvolvimento completo da aplicação.
 
+## Sumário
+- [Funcionalidade](#funcionalidades)
+- [Tecnologias](#tecnologias)
+- [Estrutura](#estrutura-do-repositório)
+- [Documentação](#documentação-do-backend---api)
+- [Deploy](#deploy-e-hospedagem)
+- [Execução](#como-executar-o-projeto-manualmente)
+- [Contribuições](#autores)
+
 ## Funcionalidades
 
 - **Gestão de eventos**: Criação, edição e visualização de eventos.
@@ -55,31 +64,34 @@ A API está documentada via Swagger. Confira os endpoints em:
 
 O projeto segue uma estrutura modular com pastas organizadas por contexto (auth, eventos, usuários, etc), facilitando a escalabilidade e manutenção.
 
+## Deploy e Hospedagem
 
-## Como Executar o Projeto
+O projeto está hospedado em plataformas cloud com deploy contínuo. Abaixo estão os links e detalhes de cada parte:
+
+### **Backend**
+- **Plataforma**: [Render](https://render.com)
+- **URL da API**: [URL da API](https://evenflow-platform.onrender.com)
+
+### **Frontend**
+- **Plataforma**: [Vercel](https://vercel.com)
+- **Site da Evenflow**: [Evenflow](https://evenflow-platform.vercel.app/)
+
+## Como Executar o Projeto Manualmente
 
 Pré-requisitos
  - Node.js >= 18
  - PostgreSQL
 
-Executando Manualmente
-
-## Backend
+### **Backend**
 ```cd backend && npm install```
 ```npm run dev```
 
-## Frontend
+### **Frontend**
 ```cd frontend && yarn```
 ```yarn run dev```
 
-## Segurança
- - JWT para autenticação
- - Validação de dados com middlewares
- - Upload de arquivos com controle de tipos
- - Regras de acesso com rotas protegidas
 
- ## 📄 Licença
-
+ ## Licença
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
  ![GitHub license](https://img.shields.io/github/license/WagnerSantos98/evenflow-platform)
