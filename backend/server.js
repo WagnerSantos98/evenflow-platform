@@ -1,5 +1,7 @@
 require('dotenv').config();
 const express = require('express');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpec = require('./src/config/swagger');
 const cors = require('cors');
 const { sequelize } = require('./src/config/database');
 
@@ -13,6 +15,9 @@ const avaliacaoRoutes = require('./src/routes/avaliacao.routes');
 const notificacoesRoutes = require('./src/routes/notificacao.routes');
 const checkoutSessionRoutes = require('./src/routes/checkoutSession.routes');
 const webhookRoutes = require('./src/routes/webhook.routes'); // Nova rota do webhook
+
+require('./src/docs')
+
 
 
 const app = express();
@@ -30,6 +35,8 @@ app.use(
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //Rotas
 app.use('/api/auth', authRoutes);
