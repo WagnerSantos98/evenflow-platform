@@ -69,12 +69,14 @@ O projeto segue uma estrutura modular com pastas organizadas por contexto (auth,
 O projeto está hospedado em plataformas cloud com deploy contínuo. Abaixo estão os links e detalhes de cada parte:
 
 ### **Backend**
-- **Plataforma**: [Render](https://render.com)
 - **URL da API**: [URL da API](https://evenflow-platform.onrender.com)
+- **Plataforma**: [Render](https://render.com)
+
 
 ### **Frontend**
+- **Site do Evenflow**: [Evenflow](https://evenflow-platform.vercel.app/)
 - **Plataforma**: [Vercel](https://vercel.com)
-- **Site da Evenflow**: [Evenflow](https://evenflow-platform.vercel.app/)
+
 
 ## Como Executar o Projeto Manualmente
 
