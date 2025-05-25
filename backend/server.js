@@ -24,8 +24,7 @@ const app = express();
 
 //Middlewares
 app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true
+    origin: ['http://localhost:5173', 'https://evenflow-platform.vercel.app']
 }));
 app.use(
     '/api/webhook',
