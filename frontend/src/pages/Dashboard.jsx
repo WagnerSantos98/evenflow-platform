@@ -13,6 +13,11 @@ import Eventos from '../components/dashboard/eventos/Eventos';
 import Usuarios from '../components/dashboard/usuarios/Usuarios';
 import Relatorios from '../components/dashboard/relatorios/Relatorios';
 import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
+import Locais from '../components/dashboard/locais/Locais';
+import Perfil from '../components/dashboard/perfil/Perfil';
+import Avaliacoes from '../components/dashboard/avaliacoes/Avaliacoes';
+import Compras from '../components/dashboard/compras/Compras';
+import { useAuth } from '../hook/auth/useAuth';
 
 const Dashboard = () => {
   const [selectedTab, setSelectedTab] = useState(0);
@@ -21,6 +26,7 @@ const Dashboard = () => {
     message: '',
     severity: 'success',
   });
+  const { user } = useAuth();
 
   const handleTabChange = (event, newValue) => {
     setSelectedTab(newValue);
@@ -41,26 +47,40 @@ const Dashboard = () => {
     }));
   };
 
-  
-
-  const renderTabContent = () => {
-    switch (selectedTab) {
-      case 0:
-        return <Eventos mostrarMensagem={mostrarMensagem} />;
-      case 1:
-        return <Usuarios mostrarMensagem={mostrarMensagem} />;
-      case 2:
-        return <Relatorios mostrarMensagem={mostrarMensagem} />;
-      case 3:
-        return <Configuracoes mostrarMensagem={mostrarMensagem} />;
+  const getTabsByUserRole = () => {
+    switch (user?.nivelAcesso) {
+      case 'admin':
+        return [
+          { label: 'Eventos', component: <Eventos mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Usuários', component: <Usuarios mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Locais', component: <Locais mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Relatórios', component: <Relatorios mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Configurações', component: <Configuracoes mostrarMensagem={mostrarMensagem} /> }
+        ];
+      case 'organizador':
+        return [
+          { label: 'Eventos', component: <Eventos mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Locais', component: <Locais mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Relatórios', component: <Relatorios mostrarMensagem={mostrarMensagem} /> },
+          { label: 'Configurações', component: <Configuracoes mostrarMensagem={mostrarMensagem} /> }
+        ];
+      case 'usuario':
+        return [
+          { label: 'Perfil', component: <Perfil /> },
+          { label: 'Avaliações', component: <Avaliacoes /> },
+          { label: 'Compras', component: <Compras /> },
+          { label: 'Configurações', component: <Configuracoes mostrarMensagem={mostrarMensagem} /> }
+        ];
       default:
-        return null;
+        return [];
     }
   };
 
+  const tabs = getTabsByUserRole();
+
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h4" component="h1" gutterBottom>
         Dashboard
       </Typography>
 
@@ -68,20 +88,18 @@ const Dashboard = () => {
         <Tabs
           value={selectedTab}
           onChange={handleTabChange}
-          indicatorColor="primary"
-          textColor="primary"
-          variant="fullWidth"
+          variant="scrollable"
+          scrollButtons="auto"
         >
-          <Tab label="Eventos" />
-          <Tab label="Usuários" />
-          <Tab label="Relatórios" />
-          <Tab label="Configurações" />
+          {tabs.map((tab, index) => (
+            <Tab key={index} label={tab.label} />
+          ))}
         </Tabs>
       </Paper>
 
       <Grid container spacing={3}>
         <Grid item xs={12}>
-          {renderTabContent()}
+          {tabs[selectedTab]?.component}
         </Grid>
       </Grid>
 

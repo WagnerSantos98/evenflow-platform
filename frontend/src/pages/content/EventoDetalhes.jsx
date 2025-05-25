@@ -1,5 +1,5 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import {
   Typography,
   Box,
@@ -9,7 +9,8 @@ import {
   Chip,
   Divider,
   IconButton,
-  CircularProgress
+  CircularProgress,
+  Container
 } from '@mui/material';
 import {
   LocationOn,
@@ -28,6 +29,7 @@ import 'swiper/css';
 
 const EventoDetalhes = () => {
   const { evento, loading } = useEventoDetalhes();
+  const navigate = useNavigate();
 
   if(loading || !evento) {
       return(
@@ -62,7 +64,7 @@ const EventoDetalhes = () => {
             />
             <Chip
               icon={<LocationOn />}
-              label={`${evento.local.endereco?.cidade} - ${evento.local.endereco?.estado}`}
+              label={`${evento.local?.endereco?.cidade || 'Cidade não definida'} - ${evento.local?.endereco?.estado || 'Estado não definido'}`}
               sx={{ backgroundColor: 'rgba(255,255,255,0.2)', color: 'white' }}
             />
           </Box>
@@ -149,9 +151,11 @@ const EventoDetalhes = () => {
               <Typography variant="subtitle1" color="textSecondary">
                 Local
               </Typography>
-              <Typography variant="body1">{evento.local?.nome}</Typography>
+              <Typography variant="body1">{evento.local?.nome || 'Local não definido'}</Typography>
               <Typography variant="body2" color="textSecondary">
-                {evento.local.endereco?.rua}, {evento.local.endereco?.numero} - {evento.local.endereco?.bairro}
+                {evento.local?.endereco
+                  ? `${evento.local.endereco.rua}, ${evento.local.endereco.numero} - ${evento.local.endereco.bairro}`
+                  : 'Endereço não definido'}
               </Typography>
             </Box>
 
@@ -167,14 +171,16 @@ const EventoDetalhes = () => {
               </Typography>
             </Box>
 
-            <Link 
-              to={`/comprar-ingresso/${evento.id}`}
+            <Box sx={{ mt: 3, display: 'flex', justifyContent: 'center', gap: 2 }}>
+              <Button
+                variant="contained"
+                color="primary"
+                size="large"
+                onClick={() => navigate(`/eventos/${evento.id}/comprar`)}
               >
-               <Button variant="contained" 
-              color="primary" 
-              size="large" 
-              fullWidth sx={{ mb: 2 }}>Comprar Ingresso</Button>
-            </Link>
+                Comprar Ingresso
+              </Button>
+            </Box>
 
             <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2 }}>
               <IconButton color="primary">

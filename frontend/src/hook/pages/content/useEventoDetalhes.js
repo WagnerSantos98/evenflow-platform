@@ -15,7 +15,7 @@ const useEventoDetalhes = () => {
     const carregarEvento = async () => {
       try {
         setLoading(true);
-        const eventoDetalhado = await dashboardService.eventos.buscarEventoId(id);
+        const eventoDetalhado = await dashboardService.eventos.buscarEvento(id);
         setEvento(eventoDetalhado);
       } catch (error) {
         showError(MESSAGES.EVENTO.ERRO_OBTER, error);

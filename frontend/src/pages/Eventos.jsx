@@ -1,16 +1,17 @@
 import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { 
   Typography, Grid, Card, CardContent, CardMedia, Button, Box, CircularProgress,
-  TextField, InputAdornment, Chip, FormControl, InputLabel, Select, MenuItem
+  TextField, InputAdornment, Chip, FormControl, InputLabel, Select, MenuItem, TableCell,
+  Container, Paper, CardActions
 } from '@mui/material';
 import{ Search, LocationOn, CalendarToday } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import styled from 'styled-components';
-import { formatarData, formatarMoeda } from '../utils/fomatters';
+import { formatarMoeda } from '../utils/fomatters';
 import ptBR from 'date-fns/locale/pt-BR';
-import { motion } from 'framer-motion';
+// import { motion } from 'framer-motion';
 import useEventos from '../hook/pages/useEventos';
 
 const Eventos = () => {
@@ -28,6 +29,8 @@ const Eventos = () => {
     handlePageChange
   } = useEventos();
 
+  const navigate = useNavigate();
+
   if(loading) {
     return(
       <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
@@ -37,11 +40,7 @@ const Eventos = () => {
   }
 
   return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.5 }}
-    >
+    <div>
       <Typography variant="h1" component="h1" gutterBottom>
         Eventos
       </Typography>
@@ -117,54 +116,44 @@ const Eventos = () => {
       <Grid container spacing={3}>
   {eventos.map((evento) => (
     <Grid item xs={12} sm={6} md={4} key={evento.id}>
-      <EventCard>
+      <Card>
         <CardMedia
           component="img"
-          height="200"
-          image={evento.foto}
+          height="140"
+          image={evento.foto || 'https://via.placeholder.com/140'}
           alt={evento.nome}
         />
-        <CardContentWrapper>
-          <Chip
-            label={evento.categoria}
-            color="primary"
-            size="small"
-            sx={{ alignSelf: 'flex-start', mb: 1 }}
-          />
-          <Typography variant="h5" component="h2" gutterBottom>
+        <CardContent>
+          <Typography gutterBottom variant="h5" component="div">
             {evento.nome}
           </Typography>
-          <Typography variant="body2" color="textSecondary" paragraph>
-            {evento.descricao}
+          <Typography variant="body2" color="text.secondary">
+            {new Date(evento.data).toLocaleDateString()} às {evento.horario}
           </Typography>
-          <Box sx={{ mt: 'auto' }}>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-              <CalendarToday sx={{ mr: 1, fontSize: 20 }} />
-              <Typography variant="body2">
-                {formatarData(evento.data)}
-              </Typography>
-            </Box>
-            <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-              <LocationOn sx={{ mr: 1, fontSize: 20 }} />
-              <Typography variant="body2">
-                {evento.local.nome}, {evento.local.endereco.cidade}
-              </Typography>
-            </Box>
-            <Typography variant="h6" color="primary" gutterBottom>
-              {formatarMoeda(evento.precoIngresso)}
-            </Typography>
-            <Button
-              component={RouterLink}
-              to={`/eventos/${evento.id}`}
-              variant="contained"
-              color="primary"
-              fullWidth
-            >
-              Ver Detalhes
-            </Button>
-          </Box>
-        </CardContentWrapper>
-      </EventCard>
+          <Typography variant="body2" color="text.secondary">
+            {evento.local?.nome || 'Local não definido'}
+          </Typography>
+          <Typography variant="h6" color="primary" sx={{ mt: 2 }}>
+            {formatarMoeda(evento.precoIngresso)}
+          </Typography>
+        </CardContent>
+        <CardActions>
+          <Button
+            size="small"
+            color="primary"
+            onClick={() => navigate(`/eventos/${evento.id}`)}
+          >
+            Ver Detalhes
+          </Button>
+          <Button
+            size="small"
+            color="primary"
+            onClick={() => navigate(`/eventos/${evento.id}/comprar`)}
+          >
+            Comprar Ingresso
+          </Button>
+        </CardActions>
+      </Card>
     </Grid>
   ))}
 
@@ -182,7 +171,7 @@ const Eventos = () => {
 
 
       
-    </motion.div>
+    </div>
   );
 };
 

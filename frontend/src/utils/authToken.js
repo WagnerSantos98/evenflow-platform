@@ -1,11 +1,13 @@
+const TOKEN_KEY = '@Evenflow:token';
+
 export const getToken = () => {
-    return localStorage.getItem('authToken');
+    return localStorage.getItem(TOKEN_KEY);
 };
 
 export const setToken = (token) => {
-    localStorage.setItem('authToken', token);
+    localStorage.setItem(TOKEN_KEY, token);
 };
 
-export const clearToken = () => {
-    localStorage.removeItem('authToken');
+export const removeToken = () => {
+    localStorage.removeItem(TOKEN_KEY);
 };

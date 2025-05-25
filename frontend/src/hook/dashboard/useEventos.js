@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import useSnackbar  from '../useSnackbar';
+import useSnackbar from '../useSnackbar';
 import { MESSAGES } from '../../utils/alerts/messages';
-import dashboardService from '../../services/dashboard/dashboardService'; 
+import dashboardService from '../../services/dashboard/dashboardService';
 
 //Constantes inciais
 const ITEMS_POR_PAGINA = 5;
@@ -10,12 +10,13 @@ const INITIAL_FORM_DATA = {
     nome: '',
     descricao: '',
     data: null,
+    hora: null,
     precoIngresso: '',
     ingressosDisponiveis: '',
-    tipoEvento: '',
-    categoria: '',
-    classificacaoEtaria: '',
-    status: '',
+    tipoEvento: 'presencial',
+    categoria: 'outros',
+    classificacaoEtaria: 'L',
+    status: 'em cartaz',
     localId: '',
     foto: null,
     galeria: []
@@ -26,7 +27,7 @@ const useEventos = () => {
     const [locais, setLocais] = useState([]);
     const [pagina, setPagina] = useState(1);
     const [totalPaginas, setTotalPaginas] = useState(1);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [formOpen, setFormOpen] = useState(false);
     const [eventoSelecionado, setEventoSelecionado] = useState(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -37,6 +38,22 @@ const useEventos = () => {
     const [imagemEditando, setImagemEditando] = useState(null);
     const { snackbar, showSuccess, showError, hideSnackbar } = useSnackbar();
 
+    const MESSAGES = {
+        EVENTO: {
+            TITULO_EXCLUSAO: 'Excluir Evento',
+            CONFIRMAR_EXCLUSAO: 'Tem certeza que deseja excluir o evento {nome}?',
+            BOTAO_EXCLUIR: 'Excluir',
+            BOTAO_CANCELAR: 'Cancelar',
+            SUCESSO_CRIAR: 'Evento criado com sucesso!',
+            SUCESSO_ATUALIZAR: 'Evento atualizado com sucesso!',
+            SUCESSO_EXCLUIR: 'Evento excluído com sucesso!',
+            ERRO_CRIAR: 'Erro ao criar evento!',
+            ERRO_ATUALIZAR: 'Erro ao atualizar evento!',
+            ERRO_EXCLUIR: 'Erro ao excluir evento!',
+            ERRO_CARREGAR: 'Erro ao carregar eventos!',
+            ERRO_SALVAR: 'Erro ao salvar evento!'
+        }
+    };
 
     //Carregar usuários ao iniciar
     useEffect(() => {
@@ -60,10 +77,9 @@ const useEventos = () => {
             setEventos(eventosResponse.eventos);
             setTotalPaginas(eventosResponse.totalPaginas);
             setPagina(paginaAtual);
-            setLocais(locaisResponse)
+            setLocais(locaisResponse.locais || []);
         }catch(error){
-            showError(MESSAGES.EVENTO.ERRO_LISTAR, error);
-            showError(MESSAGES.LOCAL.ERRO_LISTAR, error);
+            showError(MESSAGES.EVENTO.ERRO_CARREGAR, error);
         }finally{
             setLoading(false);
         }
@@ -132,42 +148,129 @@ const useEventos = () => {
         setFormOpen(true);
     };
 
-    const handleSubmit = async (e) => {
-        e?.preventDefault();
-        setLoading(true);
-
-        try{
-            if(eventoSelecionado){
-                setEventos(prev => prev.map(evento => 
-                    evento.id === eventoSelecionado.id ? { ...formData, id: evento.id } : evento
-                ));
-                showSuccess(MESSAGES.EVENTO.ATUALIZADO);
-            }else{
-                const novoEvento = {
-                    ...formData,
-                    id: String(eventos.length + 1)
-                };
-                setEventos(prev => [...prev, novoEvento]);
-                setTotalPaginas(Math.ceil((eventos.length + 1) - ITEMS_POR_PAGINA));
-                showSuccess(MESSAGES.EVENTO.CRIADO);
-            }
-            setFormOpen(false);
-        }catch(error){
-            showError(MESSAGES.EVENTO.ERRO_SALVAR, error);
-        }finally{
-            setLoading(true);
-        }
-    };
-
     const handleEditarEvento = (evento) => {
         setEventoSelecionado(evento);
         setFormData({
             ...evento,
-            data: new Date(evento.data)
+            data: new Date(evento.data),
+            endereco: evento.endereco || {
+                cep: '',
+                rua: '',
+                bairro: '',
+                numero: '',
+                cidade: '',
+                estado: ''
+            }
         });
         setCapaPreview(evento.foto || '');
         setGaleriaPreviews(evento.galeria || []);
         setFormOpen(true);
+    };
+
+    const handleChange = (event) => {
+        const { name, value } = event.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleDateChange = (date) => {
+        setFormData(prev => ({
+            ...prev,
+            data: date
+        }));
+    };
+
+    const handleTimeChange = (time) => {
+        setFormData(prev => ({
+            ...prev,
+            hora: time
+        }));
+    };
+
+    const handleSubmit = async (e) => {
+        e?.preventDefault();
+        setLoading(true);
+
+        try {
+            const formDataToSend = new FormData();
+            
+            // Adiciona os campos básicos
+            Object.keys(formData).forEach(key => {
+                if (key === 'data' && formData.data) {
+                    const dataHora = new Date(formData.data);
+                    if (formData.hora) {
+                        dataHora.setHours(formData.hora.getHours());
+                        dataHora.setMinutes(formData.hora.getMinutes());
+                    }
+                    // Formata a data para 'YYYY-MM-DD HH:mm:ss'
+                    const formattedDate = `${dataHora.getFullYear()}-${('0' + (dataHora.getMonth() + 1)).slice(-2)}-${('0' + dataHora.getDate()).slice(-2)} ${('0' + dataHora.getHours()).slice(-2)}:${('0' + dataHora.getMinutes()).slice(-2)}:00`;
+                    formDataToSend.append('data', formattedDate);
+                } else if (key === 'precoIngresso') {
+                    formDataToSend.append(key, parseFloat(formData[key]));
+                } else if (key === 'ingressosDisponiveis') {
+                    formDataToSend.append(key, parseInt(formData[key]));
+                } else if (key === 'localId' && formData.tipoEvento === 'presencial') {
+                    formDataToSend.append(key, formData[key]);
+                } else if (key !== 'foto' && key !== 'galeria' && key !== 'hora' && key !== 'localId') {
+                    formDataToSend.append(key, formData[key]);
+                }
+            });
+
+            // Adiciona a capa se houver
+            if (formData.foto) {
+                if (typeof formData.foto === 'string' && formData.foto.startsWith('data:')) {
+                    // Se for uma string base64, converte para File
+                    const response = await fetch(formData.foto);
+                    const blob = await response.blob();
+                    const file = new File([blob], 'capa.jpg', { type: 'image/jpeg' });
+                    formDataToSend.append('capa', file);
+                } else {
+                    formDataToSend.append('capa', formData.foto);
+                }
+            }
+
+            // Adiciona as imagens da galeria
+            if (formData.galeria && formData.galeria.length > 0) {
+                for (const imagem of formData.galeria) {
+                    if (typeof imagem === 'string' && imagem.startsWith('data:')) {
+                        // Se for uma string base64, converte para File
+                        const response = await fetch(imagem);
+                        const blob = await response.blob();
+                        const file = new File([blob], 'galeria.jpg', { type: 'image/jpeg' });
+                        formDataToSend.append('galeria', file);
+                    } else {
+                        formDataToSend.append('galeria', imagem);
+                    }
+                }
+            }
+
+            // Log dos dados que serão enviados
+            console.log('Dados do formulário:', formData);
+            for (let pair of formDataToSend.entries()) {
+                console.log(pair[0] + ': ' + pair[1]);
+            }
+
+            if (eventoSelecionado) {
+                await dashboardService.eventos.atualizarEvento(eventoSelecionado.id, formDataToSend);
+                showSuccess(MESSAGES.EVENTO.SUCESSO_ATUALIZAR);
+            } else {
+                await dashboardService.eventos.criarEvento(formDataToSend);
+                showSuccess(MESSAGES.EVENTO.SUCESSO_CRIAR);
+            }
+
+            setFormOpen(false);
+            carregarDados();
+        } catch (error) {
+            console.error('Erro ao salvar evento:', error);
+            if (error.response) {
+                console.error('Resposta do servidor:', error.response.data);
+            }
+            showError(MESSAGES.EVENTO.ERRO_SALVAR, error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleDeleteClick = (evento) => {
@@ -178,7 +281,7 @@ const useEventos = () => {
     const handleConfirmDelete = () => {
         setEventos(prev => prev.filter(evento => evento.id !== eventoParaDeletar.id));
         setTotalPaginas(Math.ceil((eventos.length - 1) / ITEMS_POR_PAGINA));
-        showSuccess(MESSAGES.EVENTO.EXCLUIDO);
+        showSuccess(MESSAGES.EVENTO.SUCESSO_EXCLUIR);
         setDeleteDialogOpen(false);
         setEventoParaDeletar(null);
     };
@@ -215,6 +318,8 @@ const useEventos = () => {
         snackbar,
         hideSnackbar,
         MESSAGES,
+        setCapaPreview,
+        setFormData,
 
         //Manipuladores
         handleImagemCapaChange,
@@ -224,15 +329,17 @@ const useEventos = () => {
 
         //Métodos
         handleNovoEvento,
-        handleSubmit,
         handleEditarEvento,
+        handleSubmit,
         handleDeleteClick,
         handleConfirmDelete,
         handleCancelDelete,
         getStatusColor,
         setImagemEditando,
-        setFormOpen
-
+        setFormOpen,
+        handleChange,
+        handleDateChange,
+        handleTimeChange
     }
 };
 

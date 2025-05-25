@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -11,6 +11,8 @@ import {
   IconButton,
   InputAdornment,
   Divider,
+  FormControlLabel,
+  Checkbox,
 } from '@mui/material';
 import {
   Visibility,
@@ -20,7 +22,7 @@ import {
 } from '@mui/icons-material';
 import styled from 'styled-components';
 import { motion } from 'framer-motion';
-import api from '../services/api';
+import { useAuth } from '../hook/auth/useAuth';
 
 const AuthContainer = styled(Paper)`
   max-width: 500px;
@@ -41,15 +43,33 @@ const SocialButton = styled(Button)`
 
 const Auth = () => {
   const navigate = useNavigate();
+  const { login, register } = useAuth();
   
   const [tab, setTab] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [manterConectado, setManterConectado] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     senha: '',
     confirmarSenha: '',
   });
+
+  useEffect(() => {
+    // Carregar credenciais salvas ao iniciar
+    const savedEmail = localStorage.getItem('@Evenflow:savedEmail');
+    const savedPassword = localStorage.getItem('@Evenflow:savedPassword');
+    const savedManterConectado = localStorage.getItem('@Evenflow:manterConectado');
+
+    if (savedManterConectado === 'true' && savedEmail && savedPassword) {
+      setFormData(prev => ({
+        ...prev,
+        email: savedEmail,
+        senha: savedPassword
+      }));
+      setManterConectado(true);
+    }
+  }, []);
 
   const handleTabChange = (event, newValue) => {
     setTab(newValue);
@@ -63,23 +83,30 @@ const Auth = () => {
     }));
   };
 
+  const handleManterConectadoChange = (e) => {
+    setManterConectado(e.target.checked);
+  };
+
   const handleSubmit = async(e) => {
     e.preventDefault();
 
     try{
       if(tab === 0){
         //Login
-        const response = await api.post('/auth/login', {
-          email: formData.email,
-          senha: formData.senha
-        },{
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        });
+        await login(formData.email, formData.senha);
+        
+        // Salvar credenciais se "Manter-me conectado" estiver marcado
+        if (manterConectado) {
+          localStorage.setItem('@Evenflow:savedEmail', formData.email);
+          localStorage.setItem('@Evenflow:savedPassword', formData.senha);
+          localStorage.setItem('@Evenflow:manterConectado', 'true');
+        } else {
+          // Remover credenciais salvas se desmarcado
+          localStorage.removeItem('@Evenflow:savedEmail');
+          localStorage.removeItem('@Evenflow:savedPassword');
+          localStorage.removeItem('@Evenflow:manterConectado');
+        }
 
-        const { token } = response.data;
-        localStorage.setItem('authToken', token);
         navigate('/dashboard');
       }else{
         //Cadastro
@@ -88,13 +115,12 @@ const Auth = () => {
           return;
         }
 
-        const response = await api.post('/usuarios', {
+        await register({
           nome: formData.nome,
           email: formData.email,
           senha: formData.senha
         });
 
-        console.log('usuário registrado com sucesso:', response.data);
         alert('Cadastro realizado com sucesso!');
         setTab(0); //Retornar a aba de login
       }
@@ -187,6 +213,20 @@ const Auth = () => {
               onChange={handleInputChange}
               margin="normal"
               required
+            />
+          )}
+
+          {tab === 0 && (
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={manterConectado}
+                  onChange={handleManterConectadoChange}
+                  color="primary"
+                />
+              }
+              label="Manter-me conectado"
+              sx={{ mt: 1 }}
             />
           )}
 

@@ -5,6 +5,12 @@ import{
     TextField, Divider, Chip, MenuItem, InputAdornment, Avatar, FormControl, InputLabel, Select,
     CircularProgress,
     Pagination,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
 } from '@mui/material';
 import{ PhotoCamera, Visibility, VisibilityOff, Refresh, Person, Add, Edit, Delete, Block, CheckCircle } from '@mui/icons-material';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
@@ -75,93 +81,74 @@ const Usuarios = () => {
                 </Button>
             </Box>
 
-            <Grid container spacing={3}>
-                <Grid item xs={12}>
-                <Paper>
-                    <List>
-                    {usuarios.map((usuario) => (
-                        <React.Fragment key={usuario.id}>
-                        <ListItem
-                            secondaryAction={
-                            <Box>
-                                <IconButton
-                                edge="end"
-                                aria-label="status"
-                                onClick={() =>
-                                    handleToggleStatus(
-                                    usuario.id,
-                                    usuario.status === 'ativo' ? 'inativo' : 'ativo'
-                                    )
-                                }
-                                >
-                                {usuario.status === 'ativo' ? (
-                                    <CheckCircle color="success" />
-                                ) : (
-                                    <Block color="error" />
-                                )}
-                                </IconButton>
-                                <IconButton
-                                edge="end"
-                                aria-label="edit"
-                                onClick={() => handleOpenDialog(usuario)}
-                                >
-                                <Edit />
-                                </IconButton>
-                                <IconButton
-                                edge="end"
-                                aria-label="delete"
-                                onClick={() => handleDeleteClick(usuario)}
-                                >
-                                <Delete />
-                                </IconButton>
-                            </Box>
-                            }
-                        >
-                            <ListItemIcon>
-                            <Person />
-                            </ListItemIcon>
-                            <ListItemText
-                            primary={usuario.nome}
-                            secondary={
-                                <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-                                <Typography variant="body2">
-                                    Email: {usuario.email}
-                                </Typography>
-                                <Chip
-                                    label={usuario.nivelAcesso}
-                                    color={usuario.nivelAcesso === 'admin' ? 'error' :    // vermelho
-                                        usuario.nivelAcesso === 'organizador' ? 'warning' :  // amarelo
-                                        usuario.nivelAcesso === 'usuario' ? 'success' :   // verde
-                                        'default'}
-                                    size="small"
-                                />
-                                <Chip
-                                    label={usuario.status}
-                                    color={usuario.status === 'ativo' ? 'success' : 'error'}
-                                    size="small"
-                                />
-                                </Box>
-                            }
-                            />
-                        </ListItem>
-                        <Divider />
-                        </React.Fragment>
-                    ))}
-                    </List>
-                </Paper>
+            {usuarios.length === 0 ? (
+                <Box sx={{ textAlign: 'center', mt: 4 }}>
+                    <Typography variant="h6" color="textSecondary">
+                        Nenhum usuário cadastrado
+                    </Typography>
+                </Box>
+            ) : (
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead>
+                            <TableRow>
+                                <TableCell>Nome</TableCell>
+                                <TableCell>Email</TableCell>
+                                <TableCell>Documento</TableCell>
+                                <TableCell>Nível de Acesso</TableCell>
+                                <TableCell>Status</TableCell>
+                                <TableCell align="right">Ações</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {usuarios.map((usuario) => (
+                                <TableRow key={usuario.id}>
+                                    <TableCell>{usuario.nome}</TableCell>
+                                    <TableCell>{usuario.email}</TableCell>
+                                    <TableCell>{usuario.documento}</TableCell>
+                                    <TableCell>{usuario.nivelAcesso}</TableCell>
+                                    <TableCell>
+                                        <Chip 
+                                            label={usuario.status === 'ativo' ? 'Ativo' : 'Inativo'} 
+                                            color={usuario.status === 'ativo' ? 'success' : 'error'}
+                                            size="small"
+                                        />
+                                    </TableCell>
+                                    <TableCell align="right">
+                                        <Box sx={{ display: 'flex', gap: 1, justifyContent: 'flex-end' }}>
+                                            <IconButton 
+                                                size="small" 
+                                                color="primary"
+                                                onClick={() => handleOpenDialog(usuario)}
+                                            >
+                                                <Edit />
+                                            </IconButton>
+                                            <IconButton 
+                                                size="small" 
+                                                color="error"
+                                                onClick={() => handleDeleteClick(usuario)}
+                                            >
+                                                <Delete />
+                                            </IconButton>
+                                        </Box>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            )}
 
-                {totalPaginas > 1 && (
-                    <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
-                        <Pagination
-                            count={totalPaginas}
-                            page={pagina}
-                            onChange={handlePageChange}
-                            color="primary"
-                        />
-                    </Box>
-                )}
-                </Grid>
-            </Grid>
+            {totalPaginas > 1 && (
+                <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                    <Pagination
+                        count={totalPaginas}
+                        page={pagina}
+                        onChange={handlePageChange}
+                        color="primary"
+                    />
+                </Box>
+            )}
 
             <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
                 <DialogTitle>

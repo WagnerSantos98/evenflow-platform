@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import {
   AppBar,
   Toolbar,
@@ -13,8 +13,8 @@ import {
   useMediaQuery,
   useTheme,
 } from '@mui/material';
-import { Menu as MenuIcon } from '@mui/icons-material';
-import { getToken } from '../../utils/authToken';
+import { Menu as MenuIcon, Logout } from '@mui/icons-material';
+import { getToken, removeToken } from '../../utils/authToken';
 import styled from 'styled-components';
 
 const StyledAppBar = styled(AppBar)`
@@ -44,9 +44,9 @@ const Header = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const navigate = useNavigate();
 
   useEffect(() => {
-
     const checkAuth = () => {
       const token = getToken();
       setIsAuthenticated(!!token);
@@ -54,10 +54,19 @@ const Header = () => {
     
     checkAuth();
 
-    window.addEventListener('storage', checkAuth);
+    // Verificar autenticação a cada 1 segundo
+    const interval = setInterval(checkAuth, 1000);
 
-    return () => window.removeEventListener('storage', checkAuth);
+    return () => {
+      clearInterval(interval);
+    };
   }, []);
+
+  const handleLogout = () => {
+    removeToken();
+    setIsAuthenticated(false);
+    navigate('/auth');
+  };
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -83,17 +92,31 @@ const Header = () => {
           <ListItemText primary={item.text} />
         </ListItem>
       ))}
-      <ListItem>
-        <Button
-          variant="contained"
-          color="primary"
-          fullWidth
-          component={RouterLink}
-          to="/auth"
-        >
-          Entrar
-        </Button>
-      </ListItem>
+      {isAuthenticated ? (
+        <ListItem>
+          <Button
+            variant="outlined"
+            color="error"
+            fullWidth
+            startIcon={<Logout />}
+            onClick={handleLogout}
+          >
+            Sair
+          </Button>
+        </ListItem>
+      ) : (
+        <ListItem>
+          <Button
+            variant="contained"
+            color="primary"
+            fullWidth
+            component={RouterLink}
+            to="/auth"
+          >
+            Entrar
+          </Button>
+        </ListItem>
+      )}
     </List>
   );
   
@@ -125,15 +148,27 @@ const Header = () => {
                   {item.text}
                 </NavButton>
               ))}
-              <Button
-                variant="contained"
-                color="primary"
-                component={RouterLink}
-                to="/auth"
-                sx={{ ml: 2 }}
-              >
-                Entrar
-              </Button>
+              {isAuthenticated ? (
+                <Button
+                  variant="outlined"
+                  color="error"
+                  startIcon={<Logout />}
+                  onClick={handleLogout}
+                  sx={{ ml: 2 }}
+                >
+                  Sair
+                </Button>
+              ) : (
+                <Button
+                  variant="contained"
+                  color="primary"
+                  component={RouterLink}
+                  to="/auth"
+                  sx={{ ml: 2 }}
+                >
+                  Entrar
+                </Button>
+              )}
             </Box>
           )}
         </Toolbar>

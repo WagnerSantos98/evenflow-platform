@@ -1,21 +1,51 @@
 import { useState, useEffect } from 'react';
-import dashboardService from '../../services/tests/dashboardService';
+import dashboardService from '../../services/dashboard/dashboardService';
+import { useAuth } from '../../hook/auth/useAuth.jsx';
 
-//Constantes inciais
+//Constantes iniciais
 const INITIAL_FORM_DATA = {
+    // Configurações Gerais
     nomePlataforma: '',
     emailContato: '',
     telefone: '',
     endereco: '',
     cnpj: '',
+    
+    // Configurações Financeiras
     taxaServico: '',
+    comissaoOrganizador: '',
+    limitePagamento: '',
+    
+    // Configurações de Notificações
     notificacoesEmail: true,
     notificacoesPush: true,
+    notificacoesMarketing: false,
+    
+    // Configurações de Eventos
+    limiteEventosSimultaneos: '',
+    prazoCancelamento: '',
+    taxaCancelamento: '',
+    
+    // Configurações do Sistema
     manutencao: false,
     modoTeste: false,
+    temaEscuro: false,
+    
+    // Configurações de Segurança
+    autenticacaoDoisFatores: false,
+    tempoSessao: '30',
+    politicaSenha: 'media',
+    
+    // Configurações de Integração
+    stripeEnabled: false,
+    stripePublicKey: '',
+    stripeSecretKey: '',
+    pixEnabled: false,
+    pixChave: '',
 };
 
 const useConfiguracoes = (mostrarMensagem) => {
+    const { user } = useAuth();
     const [configuracoes, setConfiguracoes] = useState(INITIAL_FORM_DATA);
     const [loading, setLoading] = useState(false);
     const [snackbar, setSnackbar] = useState({ open: false, message: '', severity: 'success' });
@@ -26,13 +56,13 @@ const useConfiguracoes = (mostrarMensagem) => {
 
     //Carregar configurações
     const carregarConfiguracoes = async () => {
-        try{
+        try {
             setLoading(true);
             const data = await dashboardService.configuracoes.obterConfiguracoes();
             setConfiguracoes(data);
-        }catch(error){
-            mostrarMensagem('Erro ao carregar configurações', error);
-        }finally{
+        } catch (error) {
+            mostrarMensagem('Erro ao carregar configurações', 'error', error);
+        } finally {
             setLoading(false);
         }
     };
@@ -47,13 +77,13 @@ const useConfiguracoes = (mostrarMensagem) => {
 
     //Salvar alterações
     const handleSubmit = async () => {
-        try{
+        try {
             setLoading(true);
             await dashboardService.configuracoes.atualizarConfiguracoes(configuracoes);
-            mostrarMensagem('Configurações atualizadas com sucesso!');
-        }catch(error){
-            mostrarMensagem('Erro ao salvar configurações', error);
-        }finally{
+            mostrarMensagem('Configurações atualizadas com sucesso!', 'success');
+        } catch (error) {
+            mostrarMensagem('Erro ao salvar configurações', 'error', error);
+        } finally {
             setLoading(false);
         }
     };
@@ -65,14 +95,29 @@ const useConfiguracoes = (mostrarMensagem) => {
         }));
     };
 
-    return{
+    // Verificar permissões baseado no nível de acesso
+    const temPermissao = (secao) => {
+        switch (user?.nivelAcesso) {
+            case 'admin':
+                return true; // Admin tem acesso a tudo
+            case 'organizador':
+                return ['gerais', 'eventos', 'notificacoes'].includes(secao);
+            case 'usuario':
+                return ['gerais', 'notificacoes'].includes(secao);
+            default:
+                return false;
+        }
+    };
+
+    return {
         configuracoes,
         loading,
         snackbar,
         handleInputChange,
         handleSubmit,
-        handleCloseSnackbar
-    }
+        handleCloseSnackbar,
+        temPermissao
+    };
 };
 
 export default useConfiguracoes;

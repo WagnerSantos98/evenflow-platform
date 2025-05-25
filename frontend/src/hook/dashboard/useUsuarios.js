@@ -1,298 +1,391 @@
 import { useState, useEffect } from 'react';
-import useSnackbar from '../useSnackbar';
-import { formatarDocumento, formatarTelefone } from '../../utils/fomatters';
-import { generatePassword, buscarCep } from '../../utils/helpers';
-import { MESSAGES } from '../../utils/alerts/messages';
-import dashboardService from '../../services/dashboard/dashboardService'; 
+import dashboardService from '../../services/dashboard/dashboardService';
+import { formatarTelefone, formatarDocumento } from '../../utils/fomatters';
+import { buscarCep } from '../../utils/helpers';
 
-
-//Constantes inciais
-const ITENS_POR_PAGINA = 5;
-
-const INITIAL_FORM_DATA = {
+const useUsuarios = () => {
+  const [usuarios, setUsuarios] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [selectedUsuario, setSelectedUsuario] = useState(null);
+  const [usuarioParaDeletar, setUsuarioParaDeletar] = useState(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [formData, setFormData] = useState({
     nome: '',
     email: '',
-    senha: '',
-    foto: null,
-    tipoDocumento: '',
-    documento: '',
-    nivelAcesso: '',
-    dataNascimento: null,
     telefone: '',
+    tipoDocumento: 'CPF',
+    documento: '',
+    nivelAcesso: 'usuario',
+    dataNascimento: null,
+    senha: '',
     endereco: {
+      cep: '',
+      rua: '',
+      numero: '',
+      bairro: '',
+      cidade: '',
+      estado: ''
+    }
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [camposDesabilitados, setCamposDesabilitados] = useState({
+    rua: false,
+    bairro: false,
+    cidade: false,
+    estado: false
+  });
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [snackbar, setSnackbar] = useState({
+    open: false,
+    message: '',
+    severity: 'success'
+  });
+
+  const MESSAGES = {
+    USUARIO: {
+      TITULO_EXCLUSAO: 'Excluir Usuário',
+      CONFIRMAR_EXCLUSAO: 'Tem certeza que deseja excluir o usuário {nome}?',
+      BOTAO_EXCLUIR: 'Excluir',
+      BOTAO_CANCELAR: 'Cancelar',
+      SUCESSO_CRIAR: 'Usuário criado com sucesso!',
+      SUCESSO_ATUALIZAR: 'Usuário atualizado com sucesso!',
+      SUCESSO_EXCLUIR: 'Usuário excluído com sucesso!',
+      ERRO_CRIAR: 'Erro ao criar usuário!',
+      ERRO_ATUALIZAR: 'Erro ao atualizar usuário!',
+      ERRO_EXCLUIR: 'Erro ao excluir usuário!',
+      ERRO_CARREGAR: 'Erro ao carregar usuários!'
+    }
+  };
+
+  const carregarUsuarios = async () => {
+    try {
+      setLoading(true);
+      const response = await dashboardService.usuarios.listarUsuarios();
+      if (Array.isArray(response.usuarios)) {
+        setUsuarios(response.usuarios);
+      } else {
+        setUsuarios([]);
+      }
+    } catch (error) {
+      console.error('Erro ao carregar usuários:', error);
+      setUsuarios([]);
+      showSnackbar(MESSAGES.USUARIO.ERRO_CARREGAR, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    carregarUsuarios();
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    
+    if (name === 'telefone') {
+      const telefoneFormatado = formatarTelefone(value);
+      setFormData(prev => ({
+        ...prev,
+        [name]: telefoneFormatado
+      }));
+    } else if (name === 'documento') {
+      const documentoFormatado = formatarDocumento(value, formData.tipoDocumento);
+      setFormData(prev => ({
+        ...prev,
+        [name]: documentoFormatado
+      }));
+    } else if (name.startsWith('endereco.')) {
+      const campo = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        endereco: {
+          ...prev.endereco,
+          [campo]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        [name]: value
+      }));
+    }
+  };
+
+  const handleDateChange = (newValue) => {
+    setFormData(prev => ({
+      ...prev,
+      dataNascimento: newValue
+    }));
+  };
+
+  const handleCepChange = async (e) => {
+    const cep = e.target.value.replace(/\D/g, '');
+    if (cep.length === 8) {
+      try {
+        const endereco = await buscarCep(cep);
+        setFormData(prev => ({
+          ...prev,
+          endereco: {
+            ...prev.endereco,
+            cep: cep,
+            rua: endereco.logradouro,
+            bairro: endereco.bairro,
+            cidade: endereco.localidade,
+            estado: endereco.uf
+          }
+        }));
+        setCamposDesabilitados({
+          rua: true,
+          bairro: true,
+          cidade: true,
+          estado: true
+        });
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+        showSnackbar('Erro ao buscar CEP', 'error');
+      }
+    } else {
+      setFormData(prev => ({
+        ...prev,
+        endereco: {
+          ...prev.endereco,
+          cep: cep
+        }
+      }));
+    }
+  };
+
+  const handleGeneratePassword = () => {
+    const senha = Math.random().toString(36).slice(-8);
+    setFormData(prev => ({
+      ...prev,
+      senha
+    }));
+  };
+
+  const handlePageChange = (event, newPage) => {
+    setPagina(newPage);
+  };
+
+  const handleOpenDialog = (usuario = null) => {
+    if (usuario) {
+      setSelectedUsuario(usuario);
+      setFormData({
+        nome: usuario.nome,
+        email: usuario.email,
+        telefone: usuario.telefone,
+        tipoDocumento: usuario.tipoDocumento,
+        documento: usuario.documento,
+        nivelAcesso: usuario.nivelAcesso,
+        dataNascimento: new Date(usuario.dataNascimento),
+        senha: '',
+        endereco: {
+          cep: usuario.endereco.cep,
+          rua: usuario.endereco.rua,
+          numero: usuario.endereco.numero,
+          bairro: usuario.endereco.bairro,
+          cidade: usuario.endereco.cidade,
+          estado: usuario.endereco.estado
+        }
+      });
+    } else {
+      setSelectedUsuario(null);
+      setFormData({
+        nome: '',
+        email: '',
+        telefone: '',
+        tipoDocumento: 'CPF',
+        documento: '',
+        nivelAcesso: 'usuario',
+        dataNascimento: null,
+        senha: '',
+        endereco: {
+          cep: '',
+          rua: '',
+          numero: '',
+          bairro: '',
+          cidade: '',
+          estado: ''
+        }
+      });
+    }
+    setOpenDialog(true);
+  };
+
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
+    setSelectedUsuario(null);
+    setFormData({
+      nome: '',
+      email: '',
+      telefone: '',
+      tipoDocumento: 'CPF',
+      documento: '',
+      nivelAcesso: 'usuario',
+      dataNascimento: null,
+      senha: '',
+      endereco: {
         cep: '',
         rua: '',
-        bairro: '',
         numero: '',
-        complemento: '',
+        bairro: '',
         cidade: '',
         estado: ''
-    },
-};
+      }
+    });
+    setCamposDesabilitados({
+      rua: false,
+      bairro: false,
+      cidade: false,
+      estado: false
+    });
+  };
 
-const INITIAL_CAMPOS_DESABILITADOS = {
-    rua: true,
-    bairro: true,
-    cidade: true,
-    estado: true
-};
-
-const useUsuarios = (mostrarMensagem) => {
-    const [usuarios, setUsuarios] = useState([]);
-    const [openDialog, setOpenDialog] = useState(false);
-    const [selectedUsuario, setSelectedUsuario] = useState(null);
-    const [formData, setFormData] = useState(INITIAL_FORM_DATA);
-    const [showPassword, setShowPassword] = useState(false);
-    const [previewUrl, setPreviewUrl] = useState(null);
-    const [camposDesabilitados, setCamposDesabilitados] =  useState(INITIAL_CAMPOS_DESABILITADOS);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const [usuarioParaDeletar, setUsuarioParaDeletar] = useState(null);
-    const [pagina, setPagina] = useState(1);
-    const [totalPaginas, setTotalPaginas] = useState(1);
-    const [loading, setLoading] = useState(false);
-    const { snackbar, showSuccess, showError, hideSnackbar } = useSnackbar();
-
-    //Carregar usuários ao iniciar
-    useEffect(() => {
-        carregarUsuarios(pagina);
-    }, [pagina]);
-
-
-
-    //Funções auxiliares
-    const carregarUsuarios = async (paginaAtual = 1) => {
-        try{
-            setLoading(true);
-            const data = await dashboardService.usuarios.listarUsuarios(paginaAtual, ITENS_POR_PAGINA);
-
-            if(data.usuarios.length === 0 && paginaAtual > 1){
-                return carregarUsuarios(paginaAtual - 1);
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const formDataToSend = new FormData();
+      const camposAlterados = {};
+      
+      // Compara os valores atuais com os valores originais
+      Object.keys(formData).forEach(key => {
+        if (key === 'endereco') {
+          // Verifica se algum campo do endereço foi alterado
+          const enderecoAlterado = {};
+          let enderecoModificado = false;
+          
+          Object.keys(formData.endereco).forEach(campo => {
+            if (formData.endereco[campo] !== selectedUsuario?.endereco?.[campo]) {
+              enderecoAlterado[campo] = formData.endereco[campo];
+              enderecoModificado = true;
             }
+          });
 
-            setUsuarios(data.usuarios); 
-            setTotalPaginas(data.totalPaginas || Math.ceil(data.total / ITENS_POR_PAGINA));
-            setPagina(paginaAtual);
-        }catch(error){
-            showError(MESSAGES.USUARIO.ERRO_LISTAR, error);
-        }finally {
-        setLoading(false);
+          if (enderecoModificado) {
+            formDataToSend.append('endereco', JSON.stringify(enderecoAlterado));
+          }
+        } else if (key === 'dataNascimento' && formData[key]) {
+          const dataOriginal = selectedUsuario?.dataNascimento ? new Date(selectedUsuario.dataNascimento) : null;
+          const dataNova = formData[key];
+          
+          if (!dataOriginal || dataOriginal.getTime() !== dataNova.getTime()) {
+            formDataToSend.append(key, dataNova.toISOString());
+          }
+        } else if (key === 'senha' && formData[key]) {
+          // Só envia a senha se foi alterada
+          formDataToSend.append(key, formData[key]);
+        } else if (formData[key] !== selectedUsuario?.[key]) {
+          // Só envia campos que foram alterados
+          formDataToSend.append(key, formData[key]);
         }
-    };
+      });
 
-    //Manipulação de Formulário
-    const handleChange = (e) => {
-        const { name, value } = e.target;
+      // Adiciona a foto se houver
+      if (formData.foto instanceof File) {
+        formDataToSend.append('foto', formData.foto);
+      }
 
-        if(name === 'documento'){
-            const documentoFormatado = formatarDocumento(value, formData.tipoDocumento);
-            setFormData(prev => ({
-                ...prev,
-                documento: documentoFormatado
-            }));
-        }else if(name === 'telefone'){
-            const telefoneFormatado = formatarTelefone(value);
-            setFormData(prev => ({
-                ...prev,
-                telefone: telefoneFormatado
-            }));
-        }else if(name.startsWith('endereco.')){
-            const enderecoField = name.split('.')[1];
-            setFormData(prev => ({
-                ...prev,
-                endereco: { ...prev.endereco, [enderecoField]: value }
-            }));
-        }else{
-            setFormData(prev => ({
-                ...prev,
-                [name]: value
-            }));
+      // Não envia os campos documento e endereco na atualização
+      Object.keys(formDataToSend).forEach(key => {
+        if (selectedUsuario && (key === 'documento' || key === 'endereco')) {
+          delete formDataToSend[key];
         }
-    };
+      });
 
-    const handleDateChange = (date) => {
-        setFormData(prev => ({
-            ...prev,
-            dataNascimento: date
-        }));
-    };
+      if (selectedUsuario) {
+        // Atualizar usuário existente
+        await dashboardService.usuarios.atualizarUsuario(selectedUsuario.id, formDataToSend);
+        showSnackbar(MESSAGES.USUARIO.SUCESSO_ATUALIZAR);
+      } else {
+        // Criar novo usuário
+        await dashboardService.usuarios.criarUsuario(formDataToSend);
+        showSnackbar(MESSAGES.USUARIO.SUCESSO_CRIAR);
+      }
 
-    const handleFotoChange = (e) => {
-        const file = e.target.files[0];
-        if(file){
-            setFormData(prev => ({
-                ...prev,
-                foto: file
-            }));
-            setPreviewUrl(URL.createObjectURL(file));
-        }
-    };
+      handleCloseDialog();
+      carregarUsuarios();
+    } catch (error) {
+      console.error('Erro ao salvar usuário:', error);
+      showSnackbar(
+        selectedUsuario ? MESSAGES.USUARIO.ERRO_ATUALIZAR : MESSAGES.USUARIO.ERRO_CRIAR,
+        'error'
+      );
+    }
+  };
 
-    const handleGeneratePassword = () => {
-    const newPassword = generatePassword(); // Agora retorna a senha
-    setFormData(prev => ({
-        ...prev,
-        senha: newPassword
+  const handleDeleteClick = (usuario) => {
+    setUsuarioParaDeletar(usuario);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      await dashboardService.usuarios.excluirUsuario(usuarioParaDeletar.id);
+      showSnackbar(MESSAGES.USUARIO.SUCESSO_EXCLUIR, 'success');
+      carregarUsuarios();
+    } catch (error) {
+      console.error('Erro ao excluir usuário:', error);
+      showSnackbar(MESSAGES.USUARIO.ERRO_EXCLUIR, 'error');
+    } finally {
+      setDeleteDialogOpen(false);
+      setUsuarioParaDeletar(null);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteDialogOpen(false);
+    setUsuarioParaDeletar(null);
+  };
+
+  const showSnackbar = (message, severity = 'success') => {
+    setSnackbar({
+      open: true,
+      message,
+      severity
+    });
+  };
+
+  const hideSnackbar = () => {
+    setSnackbar(prev => ({
+      ...prev,
+      open: false
     }));
+  };
+
+  return {
+    usuarios,
+    openDialog,
+    selectedUsuario,
+    usuarioParaDeletar,
+    deleteDialogOpen,
+    formData,
+    showPassword,
+    camposDesabilitados,
+    pagina,
+    totalPaginas,
+    loading,
+    snackbar,
+    MESSAGES,
+
+    //Manipuladores
+    handleChange,
+    handleDateChange,
+    handleCepChange,
+    handleGeneratePassword,
+    handlePageChange,
+
+    //Métodos
+    handleOpenDialog,
+    handleCloseDialog,
+    handleSubmit,
+    handleDeleteClick,
+    handleConfirmDelete,
+    handleCancelDelete,
+    hideSnackbar,
+    setShowPassword
+  };
 };
-
-    const handleCepChange = async (e) => {
-        const { value } = e.target;
-        const cepFormatado = value.replace(/\D/g, '').replace(/(\d{5})(\d)/, '$1-$2');
-    
-        setFormData(prev => ({
-            ...prev,
-            endereco: { ...prev.endereco, cep: cepFormatado },
-        }));
-
-        if (value.replace(/\D/g, '').length === 8) {
-            await buscarCep(value, setFormData, setCamposDesabilitados);
-        }
-    };
-
-    const handlePageChange = (event, newPage) => {
-        if (newPage >= 1 && newPage <= totalPaginas) {
-            setPagina(newPage);
-        }
-    };
-
-    //CRUD de usuários
-    const handleOpenDialog = (usuario = null) => {
-        if(usuario){
-            setSelectedUsuario(usuario);
-            setFormData({
-                ...usuario,
-                senha: '',
-                foto: null,
-                endereco: usuario.endereco || INITIAL_FORM_DATA.endereco
-            });
-        }else{
-            setSelectedUsuario(null);
-            setFormData(INITIAL_FORM_DATA);
-        }
-        setOpenDialog(true);
-    };
-
-    const handleCloseDialog = () => {
-        setOpenDialog(false);
-        setSelectedUsuario(null);
-        setPreviewUrl(null);
-        setFormData(INITIAL_FORM_DATA);
-    };
-
-    const handleSubmit = async(e) => {
-        e?.preventDefault();
-        setLoading(true);
-
-        const camposObrigatorios = ['nome', 'email', 'senha', 'tipoDocumento', 'documento', 'nivelAcesso', 'telefone'];
-        const camposFaltantes = camposObrigatorios.filter(campo => !formData[campo]);
-
-        if(camposFaltantes.length > 0){
-            mostrarMensagem(`Por favor, preencha os campos: ${camposFaltantes.join(', ')}`, 'error');
-            return;
-        }
-
-        const camposEnderecoObrigatorios = ['cep', 'rua', 'bairro', 'numero', 'cidade', 'estado'];
-        const camposEnderecoFaltantes = camposEnderecoObrigatorios.filter(campo => !formData.endereco[campo]);
-
-        if (camposEnderecoFaltantes.length > 0) {
-            mostrarMensagem(`Por favor, preencha os campos do endereço: ${camposEnderecoFaltantes.join(', ')}`, 'error');
-            return;
-        }
-
-        try{
-            if(selectedUsuario){
-                await dashboardService.usuarios.atualizarUsuario(selectedUsuario.id, formData);
-                showSuccess(MESSAGES.USUARIO.ATUALIZADO);
-            }else{
-                await dashboardService.usuarios.criarUsuario(formData);
-                showSuccess(MESSAGES.USUARIO.CRIADO);
-            }
-            
-            carregarUsuarios();
-            handleCloseDialog();
-        }catch(error){
-            showError(MESSAGES.USUARIO.ERRO_SALVAR, error);
-        }
-    };
-
-    const handleDeleteClick = (usuario) => {
-        setUsuarioParaDeletar(usuario);
-        setDeleteDialogOpen(true);
-    };
-
-    const handleConfirmDelete = async () => {
-        try{
-            await dashboardService.usuarios.excluirUsuario(usuarioParaDeletar.id);
-
-            await carregarUsuarios(pagina);
-
-            showSuccess(MESSAGES.USUARIO.EXCLUIDO);
-            setDeleteDialogOpen(false);
-            setUsuarioParaDeletar(null);
-        }catch(error){
-            showError(MESSAGES.USUARIO.ERRO_EXCLUIR, error);
-        }
-        
-    };
-
-    const handleCancelDelete = () => {
-        setDeleteDialogOpen(false);
-        setUsuarioParaDeletar(null);
-    };
-
-
-    const handleToggleStatus = async(id, novoStatus) => {
-        try{
-            await dashboardService.usuarios.atualizarStatusUsuario(id, novoStatus);
-            mostrarMensagem('Status atualizado com sucesso!', 'success');
-            carregarUsuarios();
-        }catch(error){  
-            mostrarMensagem('Erro ao atualizar status', 'error', error)
-        }
-    };
-
-
-
-    return{
-        usuarios,
-        openDialog,
-        selectedUsuario,
-        formData,
-        showPassword,
-        previewUrl,
-        camposDesabilitados,
-        usuarioParaDeletar,
-        deleteDialogOpen,
-        pagina,
-        totalPaginas,
-        loading,
-        snackbar,
-        hideSnackbar,
-        MESSAGES,
-
-
-        
-        //Manipuladores
-        handleChange,
-        handleDateChange,
-        handleFotoChange,
-        handleGeneratePassword,
-        handleCepChange,
-        handlePageChange,
-
-        //Métodos
-        handleOpenDialog,
-        handleCloseDialog,
-        handleSubmit,
-        handleDeleteClick,
-        handleConfirmDelete,
-        handleCancelDelete,
-        handleToggleStatus,
-        setShowPassword
-    };
-};
-
-
-    
 
 export default useUsuarios;

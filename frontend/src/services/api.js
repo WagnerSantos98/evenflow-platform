@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getToken, clearToken } from '../utils/authToken';
+import { getToken, removeToken } from '../utils/authToken';
 
 //Conexão com API - 
 const api = axios.create({
@@ -26,8 +26,8 @@ api.interceptors.response.use(
             switch(status){
                 case 401:
                     //Token expirado ou inválido
-                    clearToken();
-                    window.location.href = '/login';
+                    removeToken();
+                    window.location.href = '/auth';
                     break;
                 case 403:
                     //Acesso negado
