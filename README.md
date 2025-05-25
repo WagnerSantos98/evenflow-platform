@@ -58,6 +58,9 @@ evenflow-platform/
         ├── styles/          # Estilização global e temática
         └── utils/           # Funções utilitárias
 ```
+## Documentação do Backend - API
+A API está documentada via Swagger. Confira os endpoints em: 
+[evenflow-platform/api-docs](https://evenflow-platform.onrender.com/api-docs/)
 
 
 ## Como Executar o Projeto
