@@ -92,6 +92,7 @@ Pré-requisitos
 
 
  ## Licença
+
 Distribuído sob a licença MIT. Veja `LICENSE` para mais informações.
 
  ![GitHub license](https://img.shields.io/github/license/WagnerSantos98/evenflow-platform)
