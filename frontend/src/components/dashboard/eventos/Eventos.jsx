@@ -5,6 +5,7 @@ import{
     DialogContent, DialogActions, TextField, Grid, MenuItem, Autocomplete, FormControl, InputLabel, Select
 } from '@mui/material';
 import{ Edit, Delete, LocationOn, CalendarToday, AttachMoney, People, CloudUpload, Add } from '@mui/icons-material';
+import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import styled from 'styled-components';
@@ -104,7 +105,7 @@ const Eventos = () => {
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                                                     <LocationOn sx={{ mr: 1, fontSize: 16 }} />
                                                     <Typography variant="body2">
-                                                        {evento.local.nome}, {evento.local.endereco.cidade}
+                                                        {evento.local?.nome}, {evento.local?.endereco?.cidade}
                                                     </Typography>
                                                 </Box>
                                                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -224,7 +225,7 @@ const Eventos = () => {
 
                             <Grid item xs={12} sm={6}>
                                 <LocalizationProvider dateAdapter={AdapterDateFns} adapterLocale={ptBR}>
-                                    <DatePicker
+                                    <DateTimePicker
                                         label="Data do Evento"
                                         value={formData.data}
                                         onChange={(newValue) => setFormData(prev => ({ ...prev, data: newValue }))}
@@ -258,72 +259,72 @@ const Eventos = () => {
                                 />
                             </Grid>
 
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} md={6}>
                                 <FormControl fullWidth required>
-                                <InputLabel>Tipo de Evento</InputLabel>
-                                <Select
-                                    name="tipoEvento"
-                                    value={formData.tipoEvento}
-                                    onChange="{handleChange}"
-                                    label="Nível de Acesso"
-                                >
-                                    <MenuItem value="presencial">Presencial</MenuItem>
-                                    <MenuItem value="online">Online</MenuItem>
-                                </Select>
+                                    <InputLabel>Tipo de Evento</InputLabel>
+                                    <Select
+                                        name="tipoEvento"
+                                        value={formData.tipoEvento || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, tipoEvento: e.target.value }))}
+                                        label="Tipo de Evento"
+                                    >
+                                        <MenuItem value="presencial">Presencial</MenuItem>
+                                        <MenuItem value="online">Online</MenuItem>
+                                    </Select>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} md={6}>
                                 <FormControl fullWidth required>
-                                <InputLabel>Categoria</InputLabel>
-                                <Select
-                                    name="categoria"
-                                    value={formData.categoria}
-                                    onChange="{handleChange}"
-                                    label="Nível de Acesso"
-                                >
-                                    <MenuItem value="comedia">Comédia</MenuItem>
-                                    <MenuItem value="familia">Família</MenuItem>
-                                    <MenuItem value="infantil">Infantil</MenuItem>
-                                    <MenuItem value="musical">Musical</MenuItem>
-                                    <MenuItem value="teatro">Teatro</MenuItem>
-                                    <MenuItem value="esporte">Esporte</MenuItem>
-                                    <MenuItem value="outros">Outros</MenuItem>
-                                </Select>
+                                    <InputLabel>Categoria</InputLabel>
+                                    <Select
+                                        name="categoria"
+                                        value={formData.categoria || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, categoria: e.target.value }))}
+                                        label="Categoria"
+                                    >
+                                        <MenuItem value="comedia">Comédia</MenuItem>
+                                        <MenuItem value="infantil">Infantil</MenuItem>
+                                        <MenuItem value="familia">Família</MenuItem>
+                                        <MenuItem value="musical">Musical</MenuItem>
+                                        <MenuItem value="teatro">Teatro</MenuItem>
+                                        <MenuItem value="esporte">Esporte</MenuItem>
+                                        <MenuItem value="outros">Outros</MenuItem>
+                                    </Select>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} md={6}>
                                 <FormControl fullWidth required>
-                                <InputLabel>Classificação Etária</InputLabel>
-                                <Select
-                                    name="classificacaoEtaria"
-                                    value={formData.classificacaoEtaria}
-                                    onChange="{handleChange}"
-                                    label="Nível de Acesso"
-                                >
-                                    <MenuItem value="L">L</MenuItem>
-                                    <MenuItem value="14">14 anos</MenuItem>
-                                    <MenuItem value="16">16 anos</MenuItem>
-                                    <MenuItem value="18">18 anos</MenuItem>
-                                </Select>
+                                    <InputLabel>Classificação Etária</InputLabel>
+                                    <Select
+                                        name="classificacaoEtaria"
+                                        value={formData.classificacaoEtaria || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, classificacaoEtaria: e.target.value }))}
+                                        label="Classificação Etária"
+                                    >
+                                        <MenuItem value="L">Livre</MenuItem>
+                                        <MenuItem value="14">14 anos</MenuItem>
+                                        <MenuItem value="16">16 anos</MenuItem>
+                                        <MenuItem value="18">18 anos</MenuItem>
+                                    </Select>
                                 </FormControl>
                             </Grid>
 
-                            <Grid item xs={12} sm={6}>
+                            <Grid item xs={12} md={6}>
                                 <FormControl fullWidth required>
-                                <InputLabel>Status</InputLabel>
-                                <Select
-                                    name="status"
-                                    value={formData.status}
-                                    onChange="{handleChange}"
-                                    label="Nível de Acesso"
-                                >
-                                    <MenuItem value="em cartaz">Em Cartaz</MenuItem>
-                                    <MenuItem value="cancelado">Cancelado</MenuItem>
-                                    <MenuItem value="encerrado">Encerrado</MenuItem>
-                                    <MenuItem value="ativo">Ativo</MenuItem>
-                                </Select>
+                                    <InputLabel>Status</InputLabel>
+                                    <Select
+                                        name="status"
+                                        value={formData.status || ''}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value }))}
+                                        label="Status"
+                                    >
+                                        <MenuItem value="em cartaz">Em Cartaz</MenuItem>
+                                        <MenuItem value="cancelado">Cancelado</MenuItem>
+                                        <MenuItem value="encerrado">Encerrado</MenuItem>
+                                        <MenuItem value="ativo">Ativo</MenuItem>
+                                    </Select>
                                 </FormControl>
                             </Grid>
 

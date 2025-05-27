@@ -128,7 +128,14 @@ const Eventos = () => {
             {evento.nome}
           </Typography>
           <Typography variant="body2" color="text.secondary">
-            {new Date(evento.data).toLocaleDateString()} às {evento.horario}
+            {new Date(evento.data.replace(' ', 'T')).toLocaleString('pt-BR', {
+              day: '2-digit',
+              month: '2-digit',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              timeZone: 'UTC'
+            }).replace(',', ' às')}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             {evento.local?.nome || 'Local não definido'}

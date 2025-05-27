@@ -55,7 +55,7 @@ const Usuarios = () => {
         handleDeleteClick,
         handleConfirmDelete,
         handleCancelDelete,
-        handleToggleStatus,
+        //handleToggleStatus,
         setShowPassword
     } = useUsuarios();
 

@@ -142,7 +142,14 @@ const EventoDetalhes = () => {
                 Data e Horário
               </Typography>
               <Typography variant="body1">
-                {new Date(evento.data).toLocaleDateString('pt-BR')} às {new Date(evento.data).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                {new Date(evento.data.replace(' ', 'T')).toLocaleString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                timeZone: 'UTC'
+              }).replace(',', ' às')}
               </Typography>
             </Box>
 

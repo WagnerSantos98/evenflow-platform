@@ -32,6 +32,8 @@ import { buscarCep } from '../../../utils/helpers';
 const Locais = ({ mostrarMensagem }) => {
   const [locais, setLocais] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [pagina, setPagina] = useState(1);
+  const [totalPaginas, setTotalPaginas] = useState(1);
   const [openDialog, setOpenDialog] = useState(false);
   const [localSelecionado, setLocalSelecionado] = useState(null);
   const [camposDesabilitados, setCamposDesabilitados] = useState({
@@ -193,6 +195,10 @@ const Locais = ({ mostrarMensagem }) => {
     }
   };
 
+  const handlePageChange = (event, newPage) => {
+    setPagina(newPage);
+  };
+
   const handleSubmit = async () => {
     try {
       const dadosParaEnviar = {
@@ -328,6 +334,17 @@ const Locais = ({ mostrarMensagem }) => {
           </Table>
         </TableContainer>
       )}
+
+      {totalPaginas > 1 && (
+                      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
+                          <Pagination
+                              count={totalPaginas}
+                              page={pagina}
+                              onChange={handlePageChange}
+                              color="primary"
+                          />
+                      </Box>
+                  )}
 
       <Dialog open={openDialog} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         <DialogTitle>

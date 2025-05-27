@@ -27,7 +27,8 @@ const eventos = {
     criarEvento: async (dados) => {
         const response = await api.post('/eventos', dados, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json'
             }
         });
         return response.data;
@@ -36,7 +37,8 @@ const eventos = {
     atualizarEvento: async (id, dados) => {
         const response = await api.put(`/eventos/${id}`, dados, {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                'Content-Type': 'multipart/form-data',
+                'Accept': 'application/json'
             }
         });
         return response.data;

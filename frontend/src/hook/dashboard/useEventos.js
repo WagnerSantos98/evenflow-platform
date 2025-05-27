@@ -169,6 +169,7 @@ const useEventos = () => {
 
     const handleChange = (event) => {
         const { name, value } = event.target;
+        console.log('Campo alterado:', name, 'Novo valor:', value); // Debug
         setFormData(prev => ({
             ...prev,
             [name]: value
@@ -176,6 +177,7 @@ const useEventos = () => {
     };
 
     const handleDateChange = (date) => {
+        console.log('Data alterada:', date); // Debug
         setFormData(prev => ({
             ...prev,
             data: date
@@ -183,6 +185,7 @@ const useEventos = () => {
     };
 
     const handleTimeChange = (time) => {
+        console.log('Hora alterada:', time); // Debug
         setFormData(prev => ({
             ...prev,
             hora: time
@@ -256,6 +259,13 @@ const useEventos = () => {
                 await dashboardService.eventos.atualizarEvento(eventoSelecionado.id, formDataToSend);
                 showSuccess(MESSAGES.EVENTO.SUCESSO_ATUALIZAR);
             } else {
+                // Converte FormData para objeto para debug
+                const formDataObj = {};
+                formDataToSend.forEach((value, key) => {
+                    formDataObj[key] = value;
+                });
+                console.log('Dados que serão enviados:', formDataObj);
+
                 await dashboardService.eventos.criarEvento(formDataToSend);
                 showSuccess(MESSAGES.EVENTO.SUCESSO_CRIAR);
             }
@@ -278,12 +288,42 @@ const useEventos = () => {
         setDeleteDialogOpen(true);
     };
 
-    const handleConfirmDelete = () => {
-        setEventos(prev => prev.filter(evento => evento.id !== eventoParaDeletar.id));
-        setTotalPaginas(Math.ceil((eventos.length - 1) / ITEMS_POR_PAGINA));
-        showSuccess(MESSAGES.EVENTO.SUCESSO_EXCLUIR);
-        setDeleteDialogOpen(false);
-        setEventoParaDeletar(null);
+    const handleConfirmDelete = async () => {
+        if (!eventoParaDeletar?.id) {
+            showError('ID do evento não encontrado');
+            return;
+        }
+
+        try {
+            setLoading(true);
+            console.log('Tentando excluir evento:', eventoParaDeletar.id);
+            
+            const response = await dashboardService.eventos.deletarEvento(eventoParaDeletar.id);
+            console.log('Resposta da exclusão:', response);
+            
+            showSuccess(MESSAGES.EVENTO.SUCESSO_EXCLUIR);
+            setDeleteDialogOpen(false);
+            setEventoParaDeletar(null);
+            await carregarDados(); // Recarrega a lista após excluir
+        } catch (error) {
+            console.error('Erro ao excluir evento:', error);
+            if (error.response) {
+                console.error('Resposta do servidor:', error.response.data);
+                if (error.response.data.erro?.includes('Ingressos')) {
+                    showError('Não é possível excluir este evento pois existem ingressos vinculados a ele. Primeiro, cancele ou exclua os ingressos.');
+                } else {
+                    showError(`Erro ao excluir evento: ${error.response.data.message || 'Erro interno do servidor'}`);
+                }
+            } else if (error.request) {
+                console.error('Erro na requisição:', error.request);
+                showError('Erro ao conectar com o servidor');
+            } else {
+                console.error('Erro:', error.message);
+                showError(`Erro ao excluir evento: ${error.message}`);
+            }
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleCancelDelete = () => {
