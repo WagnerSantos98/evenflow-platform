@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import Eventos from '../components/dashboard/eventos/Eventos';
 import Usuarios from '../components/dashboard/usuarios/Usuarios';
-import Relatorios from '../components/dashboard/relatorios/Relatorios';
+//import Relatorios from '../components/dashboard/relatorios/Relatorios';
 import Configuracoes from '../components/dashboard/configuracoes/Configuracoes';
 import Locais from '../components/dashboard/locais/Locais';
 import Perfil from '../components/dashboard/perfil/Perfil';
@@ -54,14 +54,12 @@ const Dashboard = () => {
           { label: 'Eventos', component: <Eventos mostrarMensagem={mostrarMensagem} /> },
           { label: 'Usuários', component: <Usuarios mostrarMensagem={mostrarMensagem} /> },
           { label: 'Locais', component: <Locais mostrarMensagem={mostrarMensagem} /> },
-          { label: 'Relatórios', component: <Relatorios mostrarMensagem={mostrarMensagem} /> },
           { label: 'Configurações', component: <Configuracoes mostrarMensagem={mostrarMensagem} /> }
         ];
       case 'organizador':
         return [
           { label: 'Eventos', component: <Eventos mostrarMensagem={mostrarMensagem} /> },
           { label: 'Locais', component: <Locais mostrarMensagem={mostrarMensagem} /> },
-          { label: 'Relatórios', component: <Relatorios mostrarMensagem={mostrarMensagem} /> },
           { label: 'Configurações', component: <Configuracoes mostrarMensagem={mostrarMensagem} /> }
         ];
       case 'usuario':
